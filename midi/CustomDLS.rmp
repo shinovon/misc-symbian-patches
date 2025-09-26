@@ -1,0 +1,6 @@
+;MIDI soundbank loader from c:\resource\ensb.dls
+;By shinovon (nnproject.cc)
+;15.09.2025
+SnR:sys\bin\mobilebae.dll:0010A0E10500A0E1??FCFFEB:0000A0E10000A0E10000A0E1
+SnR:sys\bin\mobilebae.dll:5A003A005C:43003A005C
+SnR:sys\bin\mobilebae.dll:65006E00730062002E00640061007400:65006E00730062002E0064006C007300

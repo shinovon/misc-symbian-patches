@@ -1,0 +1,6 @@
+;Increase max heap for mobileBAE.dll
+;By shinovon (nnproject.cc)
+;18.09.2025
+rel:sys\bin\mobilebae.dll:2D:10:50
+rel:sys\bin\mobilebae.dll:32:1000:0020
+rel:sys\bin\mobilebae.dll:35:20:F0
