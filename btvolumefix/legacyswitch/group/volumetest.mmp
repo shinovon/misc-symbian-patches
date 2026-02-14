@@ -1,0 +1,35 @@
+TARGET		  btvolumefix.exe
+TARGETTYPE	  exe
+UID			 0 0xe443c27f
+
+USERINCLUDE	 ..\inc
+SYSTEMINCLUDE   \epoc32\include
+SYSTEMINCLUDE /epoc32/include/mw
+SYSTEMINCLUDE /epoc32/include/platform
+SYSTEMINCLUDE /epoc32/include/mmf/server
+
+SOURCEPATH	  ..\src
+SOURCE		  volumetest.cpp
+
+LIBRARY		 euser.lib
+LIBRARY		 aknnotify.lib
+LIBRARY centralrepository.lib
+
+DEBUGGABLE_UDEBONLY
+
+CAPABILITY ReadDeviceData WriteDeviceData
+
+START RESOURCE     ..\data\btvolumefix.rss
+HEADER
+TARGETPATH         \\resource\\apps
+LANG               SC
+END
+
+SOURCEPATH         ..\data
+START RESOURCE     btvolumefix_reg.rss
+#ifdef WINSCW
+TARGETPATH         \private\10003a3f\apps
+#else
+TARGETPATH         \private\10003a3f\import\apps
+#endif
+END

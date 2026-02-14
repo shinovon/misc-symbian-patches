@@ -1,0 +1,6 @@
+;Fix Bluetooth AVRCP volume on Belle Refresh
+;By shinovon (nnproject.cc)
+;14.02.2026
+SnR:sys\bin\remconbeareravrcp.dll:EA390028000197FCF7C0EA0C212800:EA390028000197FCF7C0EA00212800
+SnR:sys\bin\btaudioman.exe:050000241BE02100:0500002418E02100
+SnR:sys\bin\btaudioman.exe:FD3901D10120F8BD0020:FD3901D10120F8BD0120

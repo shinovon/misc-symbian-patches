@@ -1,0 +1,29 @@
+;CRepository4All generic version
+;Opens writing Central Repository for all programs
+;
+
+#ifdef PLATFORM_5.3
+	#define BELLE
+#endif
+
+#ifdef PLATFORM_5.4
+	#define BELLE
+#endif
+
+
+#ifdef BELLE
+	;*** Patch: CRepository4All ***
+	;By CODeRUS in 0x7DB
+	SnR:sys\bin\centralrepositorysrv.exe:080010b5:00207047
+#else
+	#ifdef PLATFORM_5.5
+		;*** Patch: CRepository4All ***
+		;By CODeRUS in 0x7DB
+		;Fix for Belle FP2 by iChris701
+		SnR:sys\bin\centralrepositorysrv.exe:080010b504681100246c1a00a047002801d0002010bd:0020704704681100246c1a00a047002801d000207047
+	#else
+		;*** Patch: CRepository4All ***
+		;By CODeRUS in 0x7DB
+		SnR:sys\bin\centralrepositorysrv.exe:080011001a:002070471a
+	#endif
+#endif

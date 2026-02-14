@@ -1,0 +1,4 @@
+;Fix Bluetooth AVRCP volume on N8 anna (unfinished)
+;By shinovon (nnproject.cc)
+;08.02.2026
+SnR:sys\bin\remconbeareravrcp.dll:39002800FCF7F6EB39002800FCF7F2EB0C21:39002800FCF7F6EB39002800FCF7F2EB0021

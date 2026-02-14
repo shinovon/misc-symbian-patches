@@ -1,0 +1,11 @@
+#{"Bluetooth Volume Workaround"},(0xe443c27f),1,0,0
+
+[0x20022E6D], 0, 0, 0, {"S60ProductID"}
+
+%{"nnproject"}
+:"nnproject"
+
+"$(EPOCROOT)epoc32\release\$(PLATFORM)\$(TARGET)\btvolumefix.exe"		  -"!:\sys\bin\btvolumefix.exe"
+"$(EPOCROOT)\epoc32\data\z\private\10003a3f\import\apps\btvolumefix_reg.rsc" - "!:\private\10003a3f\import\apps\openglex_reg.rsc"
+"$(EPOCROOT)\epoc32\data\z\resource\apps\btvolumefix.rsc"		  -"!:\resource\apps\btvolumefix.rsc"
+
