@@ -1,6 +1,28 @@
-;Fix Bluetooth AVRCP volume on Belle Refresh
+;Fix Bluetooth AVRCP volume on Anna/Belle
 ;By shinovon (nnproject.cc)
-;14.02.2026
-SnR:sys\bin\remconbeareravrcp.dll:EA390028000197FCF7C0EA0C212800:EA390028000197FCF7C0EA00212800
+;19.02.2026
+
+#ifdef PLATFORM_5.4
+	error:AVRCP bug is already fixed on Belle FP1
+#endif
+
+#ifdef PLATFORM_5.5
+	error:AVRCP bug is already fixed on Belle FP2
+#endif
+
+#ifdef PLATFORM_5.3
+	#ifdef FW_111.020.0310 ; 603 Belle
+		SnR:sys\bin\remconbeareravrcp.dll:FCF7????0C21??00FCF7??????0003A9:FCF7????0021??00FCF7??????0003A9
+	#else
+		SnR:sys\bin\remconbeareravrcp.dll:EA390028000197FCF7C0EA0C212800:EA390028000197FCF7C0EA00212800
+	#endif
+#else
+	#ifdef PLATFORM_5.2
+		SnR:sys\bin\remconbeareravrcp.dll:FCF7????0C21??00FCF7??????0003A9:FCF7????0021??00FCF7??????0003A9
+	#else
+		error:AVRCP bug is not present
+	#endif
+#endif
+
 SnR:sys\bin\btaudioman.exe:050000241BE02100:0500002418E02100
-SnR:sys\bin\btaudioman.exe:FD3901D10120F8BD0020:FD3901D10120F8BD0120
+SnR:sys\bin\btaudioman.exe:01D10120F8BD0020:01D10120F8BD0120
