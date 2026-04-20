@@ -1,0 +1,8 @@
+; Run Installserver.exe from C:/sys/bin rather than Z:/sys/bin
+; Helps to avoid certificate / update and component built in errors
+; installserver.exe must be renamed to ynstallserver.exe in C:/sys/bin
+; For latest firmwares Nokia Belle Refresh / FP1 / FP2
+; www.n8fanclub.com
+; 30.08.12
+; ExtraX7
+SnR:sys\bin\uiss.dll:000049:000059

@@ -1,0 +1,12 @@
+&EN
+
+# {"PlaybackHelper"}, (0x200159B3), 12, 0, 0, TYPE=SA, RU
+
+%{"nnproject"}
+
+:"Nokia"
+
+;[0x20022E6D],0,0,0,{"S60ProductID"}
+[0x2003A678],0,0,0,{"S60ProductID"}
+
+"playbackhelper.dll" - "c:\sys\bin\playbackhelper.dll"
