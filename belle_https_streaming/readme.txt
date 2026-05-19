@@ -1,4 +1,6 @@
-HTTPS video streaming support patch for Belle Refresh, FP1, (not yet)FP2
+HTTPS video streaming support patch for Belle Refresh, FP1
+
+doesn't work on some fp2 devices such as 603, 808, because playbackhelper_stub.sis is missing there
 
 dlls are from 808 113.010.1508
 
