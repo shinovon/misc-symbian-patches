@@ -1,0 +1,39 @@
+;Enable 1080p playback on Belle FP1 and FP2
+;By shinovon (nnproject.cc)
+;11.07.2026
+
+#ifdef PLATFORM_5.4
+	#define BELLE_FP1_FP2
+#endif
+
+#ifdef PLATFORM_5.5
+	#define BELLE_FP1_FP2
+#endif
+
+#ifdef MACHINE_2003AB64
+	error:Not applicable for this device
+#endif
+
+#ifdef BELLE_FP1_FP2
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E1210903:FF214903
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0520000206902D200001:08200002069044200001
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E1210903:FF214903
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0C983F01:0C983F02
+	SnR:sys\bin\ivevideodecodehwdevice.dll:052424020EAA93C2:082424020EAA93C2
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0520000206902D200001:08200002069044200001
+	SnR:sys\bin\ivevideodecodehwdevice.dll:F0B31A00:A0252600
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E1210903:FF214903
+	SnR:sys\bin\ivevideodecodehwdevice.dll:052424020EAA93C2:082424020EAA93C2
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0C983F01:0C983F02
+	SnR:sys\bin\ivevideodecodehwdevice.dll:F0B31A00:A0252600
+	SnR:sys\bin\ivevideodecodehwdevice.dll:F0B31A00:A0252600
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0520000206902D200001:08200002069044200001
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E1210903:FF214903
+	SnR:sys\bin\ivevideodecodehwdevice.dll:0C983F01:0C983F02
+	SnR:sys\bin\ivevideodecodehwdevice.dll:052424020EAA93C2:082424020EAA93C2
+	SnR:sys\bin\ivevideodecodehwdevice.dll:F0B31A00:A0252600
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E12000018742:FF2040018742
+	SnR:sys\bin\ivevideodecodehwdevice.dll:E121C03209038F42:FF21C03249038F42
+#else
+	error:Not applicable for this system
+#endif
