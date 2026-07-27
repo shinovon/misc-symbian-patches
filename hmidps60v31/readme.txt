@@ -1,4 +1,4 @@
-jvm s60v3.1 performance patch
+jvm s60v3.1 improvements patch
 
 exe extracted from nokia e71, was already epoc format
 
