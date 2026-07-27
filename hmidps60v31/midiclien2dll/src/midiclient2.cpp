@@ -7,6 +7,7 @@
 #define DEFAULT_VOLUME 7
 #define VOLUME_STEP 1
 
+// copied from s60v5 sdk headers
 class CMidiClientUtiliti : public CBase
 	{
 	class CBody;
@@ -124,11 +125,13 @@ static RPointerArray<CMidiClientUtility> players(4);
 static CArrayFixFlat<TInt> playersVolume(4);
 static RMutex* lock = NULL;
 
-static void SetPlayerVolumeL(CMidiClientUtility* player, TInt origVolume) {
+static void SetPlayerVolumeL(CMidiClientUtility* player, TInt origVolume)
+{
 	player->SetVolumeL(volume == 0 ? 0 : (origVolume * volume / MAX_VOLUME));
 }
 
-static void UpdateVolume() {
+static void UpdateVolume()
+{
 	if (lock != NULL) {
 		lock->Wait();
 		TInt len = players.Count();
@@ -211,6 +214,53 @@ EXPORT_C void CMidiClientUtiliti::SetVolumeL(TInt aVolume)
 	SetPlayerVolumeL(reinterpret_cast<CMidiClientUtility*>(this), aVolume);
 }
 
+static void AddPlayerL(CMidiClientUtility* player)
+{
+	if (observer == NULL) {
+		observer = CRemConObserver::NewL();
+	}
+	players.AppendL(player);
+	TRAPD(err, playersVolume.AppendL(0));
+	if (err) {
+		players.Remove(players.Count());
+	}
+}
+
+EXPORT_C CMidiClientUtiliti* CMidiClientUtiliti::NewL(MMidiClientUtilityObserver& aObserver,
+	TInt aPriority, TMdaPriorityPreference aPref, TBool aUseSharedHeap)
+{
+	CMidiClientUtility* r = CMidiClientUtility::NewL(aObserver, aPriority, aPref, aUseSharedHeap);
+	if (lock == NULL) {
+		// TODO leak
+		lock = new RMutex;
+		lock->CreateLocal();
+	}
+	lock->Wait();
+	TRAP_IGNORE(AddPlayerL(r));
+	lock->Signal();
+	return reinterpret_cast<CMidiClientUtiliti*>(r);
+}
+
+EXPORT_C void CMidiClientUtiliti::Close()
+{
+	if (lock != NULL) {
+		lock->Wait();
+		TInt idx = players.Find(reinterpret_cast<CMidiClientUtility*>(this));
+		if (idx != -1) {
+			players.Remove(idx);
+			playersVolume.Delete(idx);
+		}
+		if (observer != NULL && players.Count() == 0) {
+			delete observer;
+			observer = NULL;
+		}
+		lock->Signal();
+	}
+	reinterpret_cast<CMidiClientUtility*>(this)->Close();
+}
+
+// stubs
+
 EXPORT_C void CMidiClientUtiliti::SetBalanceL(TInt aBalance)
 {
 	reinterpret_cast<CMidiClientUtility*>(this)->SetBalanceL(aBalance);
@@ -262,24 +312,6 @@ EXPORT_C void CMidiClientUtiliti::Play()
 EXPORT_C void CMidiClientUtiliti::Stop(const TTimeIntervalMicroSeconds& aFadeOutDuration)
 {
 	reinterpret_cast<CMidiClientUtility*>(this)->Stop(aFadeOutDuration);
-}
-
-EXPORT_C void CMidiClientUtiliti::Close()
-{
-	if (lock != NULL) {
-		lock->Wait();
-		TInt idx = players.Find(reinterpret_cast<CMidiClientUtility*>(this));
-		if (idx != -1) {
-			players.Remove(idx);
-			playersVolume.Delete(idx);
-		}
-		if (observer != NULL && players.Count() == 0) {
-			delete observer;
-			observer = NULL;
-		}
-		lock->Signal();
-	}
-	reinterpret_cast<CMidiClientUtility*>(this)->Close();
 }
 
 EXPORT_C void CMidiClientUtiliti::OpenDes(const TDesC8& aDescriptor)
@@ -360,30 +392,4 @@ EXPORT_C TInt CMidiClientUtiliti::TempoMicroBeatsPerMinuteL() const
 EXPORT_C TMidiState CMidiClientUtiliti::State() const
 {
 	return reinterpret_cast<const CMidiClientUtility*>(this)->State();
-}
-
-static void AddPlayerL(CMidiClientUtility* player) {
-	if (observer == NULL) {
-		observer = CRemConObserver::NewL();
-	}
-	players.AppendL(player);
-	TRAPD(err, playersVolume.AppendL(0));
-	if (err) {
-		players.Remove(players.Count());
-	}
-}
-
-EXPORT_C CMidiClientUtiliti* CMidiClientUtiliti::NewL(MMidiClientUtilityObserver& aObserver,
-	TInt aPriority, TMdaPriorityPreference aPref, TBool aUseSharedHeap)
-{
-	CMidiClientUtility* r = CMidiClientUtility::NewL(aObserver, aPriority, aPref, aUseSharedHeap);
-	if (lock == NULL) {
-		// TODO leak
-		lock = new RMutex;
-		lock->CreateLocal();
-	}
-	lock->Wait();
-	TRAP_IGNORE(AddPlayerL(r));
-	lock->Signal();
-	return reinterpret_cast<CMidiClientUtiliti*>(r);
 }
