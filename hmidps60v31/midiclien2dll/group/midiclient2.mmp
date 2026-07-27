@@ -1,0 +1,23 @@
+TARGET midiclien2.dll
+TARGETTYPE dll
+UID 270484809 0x201f7d00
+CAPABILITY ALL -TCB
+VENDORID 0x70000001
+
+EPOCALLOWDLLDATA
+
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\platform
+SYSTEMINCLUDE \epoc32\include\mmf\server
+
+SOURCEPATH ..\src
+SOURCE midiclient2.cpp
+
+nostrictdef
+
+LIBRARY euser.lib
+LIBRARY midiclient.lib
+LIBRARY remconinterfacebase.lib
+LIBRARY remconcoreapi.lib
+
+DEFFILE midiclien2.def

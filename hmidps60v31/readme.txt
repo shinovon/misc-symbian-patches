@@ -7,6 +7,7 @@ added -UseVerifier to disable preverification
 added -comp to force AoT and disable JIT
 changed z: to c: in bcp arg, to enable adding extra classes to c:\private\102033e6\extensions.jar
 increased bytecode size limit for jit compilation from 1500 to 65535
+replaced "midiclient{000a0000}[101f7d00].dll" import with "midiclien2{000a0000}[201f7d00].dll" wrapper for volume control support
 
 patch in hex:
 B19D8: 00 -> 01
@@ -15,13 +16,20 @@ B1B44-B1B59: 3D 53 74 61 63 6B 53 69 7A 65 49 6E 63 72 65 6D 65 6E 74 35 31 32 -
 B1B7C-B1B83: 4A 61 72 43 61 63 68 65 -> 56 65 72 69 66 69 65 72
 B1B89-B1B9B: 43 61 63 68 65 4A 61 72 46 69 6C 65 48 61 6E 64 6C 65 73 -> 4D 69 78 65 64 4D 6F 64 65 00 00 00 00 00 00 00 00 00 00
 8FA88-8FA89: DC 05 -> FF FF
+2618BD: 74 -> 32
+2618C9: 21 -> 32
 
-requires c2z4bin and copying resources of 102033e6 from z to c
-not sure about compatibility
+see midiclien2dll for midi volume control wrapper sources
 
+
+sometines needs c2z4bin
+requires copying resources of 102033e6 from z to c
+
+works on e90, e71, n95, n82, е51
+doesn't work on 6120c and maybe on some specific firmware versions too
 
 asd1.rmp and asd2.rmp are first attempts to patch extensions.jar path
 
 classpath extensions can not replace existing classes
 
-by shinovon, worked on this on 03.08.2024, 29.04.2025, 03.02.2026
+by shinovon, worked on this on 03.08.2024, 29.04.2025, 03.02.2026, 27.07.2026

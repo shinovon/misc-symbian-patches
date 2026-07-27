@@ -1,0 +1,92 @@
+EXPORTS
+	_ZN18CMidiClientUtiliti10SetVolumeLEi @ 1 NONAME
+	_ZN18CMidiClientUtiliti11SetBalanceLEi @ 2 NONAME
+	_ZN18CMidiClientUtiliti11SetRepeatsLEiRK25TTimeIntervalMicroSeconds @ 3 NONAME ABSENT
+	_ZN18CMidiClientUtiliti12SendMessageLERK6TDesC8 @ 4 NONAME
+	_ZN18CMidiClientUtiliti12SendMessageLERK6TDesC8RK25TTimeIntervalMicroSeconds @ 5 NONAME ABSENT
+	_ZN18CMidiClientUtiliti12SetPriorityLEi22TMdaPriorityPreference @ 6 NONAME
+	_ZN18CMidiClientUtiliti12SetStopTimeLERK25TTimeIntervalMicroSeconds @ 7 NONAME ABSENT
+	_ZN18CMidiClientUtiliti14GetInstrumentLEiRiS0_ @ 8 NONAME ABSENT
+	_ZN18CMidiClientUtiliti14SetInstrumentLEiii @ 9 NONAME
+	_ZN18CMidiClientUtiliti14SetVolumeRampLERK25TTimeIntervalMicroSeconds @ 10 NONAME ABSENT
+	_ZN18CMidiClientUtiliti15LoadCustomBankLERK7TDesC16Ri @ 11 NONAME ABSENT
+	_ZN18CMidiClientUtiliti15SendMipMessageLERK6RArrayI16TMipMessageEntryE @ 12 NONAME ABSENT
+	_ZN18CMidiClientUtiliti15SetChannelMuteLEii @ 13 NONAME ABSENT
+	_ZN18CMidiClientUtiliti16SetMaxPolyphonyLEi @ 14 NONAME ABSENT
+	_ZN18CMidiClientUtiliti16SetPlaybackRateLEi @ 15 NONAME
+	_ZN18CMidiClientUtiliti17SetChannelVolumeLEif @ 16 NONAME ABSENT
+	_ZN18CMidiClientUtiliti17UnloadCustomBankLEi @ 17 NONAME ABSENT
+	_ZN18CMidiClientUtiliti18CustomCommandAsyncERK8TPckgBufI22TMMFMessageDestinationEiRK6TDesC8S7_R14TRequestStatus @ 18 NONAME ABSENT
+	_ZN18CMidiClientUtiliti18CustomCommandAsyncERK8TPckgBufI22TMMFMessageDestinationEiRK6TDesC8S7_R5TDes8R14TRequestStatus @ 19 NONAME ABSENT
+	_ZN18CMidiClientUtiliti18CustomCommandSyncLERK8TPckgBufI22TMMFMessageDestinationEiRK6TDesC8S7_ @ 20 NONAME ABSENT
+	_ZN18CMidiClientUtiliti18CustomCommandSyncLERK8TPckgBufI22TMMFMessageDestinationEiRK6TDesC8S7_R5TDes8 @ 21 NONAME ABSENT
+	_ZN18CMidiClientUtiliti19LoadCustomBankDataLERK6TDesC8Ri @ 22 NONAME ABSENT
+	_ZN18CMidiClientUtiliti21LoadCustomInstrumentLERK7TDesC16iiii @ 23 NONAME ABSENT
+	_ZN18CMidiClientUtiliti21UnloadAllCustomBanksLEv @ 24 NONAME ABSENT
+	_ZN18CMidiClientUtiliti22SetPitchTranspositionLEi @ 25 NONAME
+	_ZN18CMidiClientUtiliti22SetPositionMicroBeatsLEx @ 26 NONAME ABSENT
+	_ZN18CMidiClientUtiliti23UnloadCustomInstrumentLEii @ 27 NONAME ABSENT
+	_ZN18CMidiClientUtiliti24SetPositionMicroSecondsLERK25TTimeIntervalMicroSeconds @ 28 NONAME
+	_ZN18CMidiClientUtiliti25LoadCustomInstrumentDataLERK6TDesC8iiii @ 29 NONAME ABSENT
+	_ZN18CMidiClientUtiliti30SetSyncUpdateCallbackIntervalLERK25TTimeIntervalMicroSecondsx @ 30 NONAME ABSENT
+	_ZN18CMidiClientUtiliti4NewLER26MMidiClientUtilityObserverii @ 31 NONAME ABSENT
+	_ZN18CMidiClientUtiliti4PlayEv @ 32 NONAME
+	_ZN18CMidiClientUtiliti4StopERK25TTimeIntervalMicroSeconds @ 33 NONAME
+	_ZN18CMidiClientUtiliti5CloseEv @ 34 NONAME
+	_ZN18CMidiClientUtiliti7NoteOnLEiii @ 35 NONAME ABSENT
+	_ZN18CMidiClientUtiliti7OpenDesERK6TDesC8 @ 36 NONAME
+	_ZN18CMidiClientUtiliti7OpenUrlERK7TDesC16iRK6TDesC8 @ 37 NONAME ABSENT
+	_ZN18CMidiClientUtiliti8NoteOffLEiii @ 38 NONAME ABSENT
+	_ZN18CMidiClientUtiliti8OpenFileERK7TDesC16 @ 39 NONAME
+	_ZN18CMidiClientUtiliti8SetBankLEi @ 40 NONAME ABSENT
+	_ZN18CMidiClientUtiliti9MimeTypeLEv @ 41 NONAME ABSENT
+	_ZN18CMidiClientUtiliti9PlayNoteLEiiRK25TTimeIntervalMicroSecondsS2_ii @ 42 NONAME ABSENT
+	_ZN18CMidiClientUtiliti9PlayNoteLEiiRK25TTimeIntervalMicroSecondsii @ 43 NONAME ABSENT
+	_ZN18CMidiClientUtiliti9SetTempoLEi @ 44 NONAME
+	_ZN18CMidiClientUtiliti9StopNotesEi @ 45 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti10GetBankIdLEii @ 46 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti10GetRepeatsEv @ 47 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti10MaxVolumeLEv @ 48 NONAME
+	_ZNK18CMidiClientUtiliti10NumTracksLEv @ 49 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti10PolyphonyLEv @ 50 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti11GetBalanceLEv @ 51 NONAME
+	_ZNK18CMidiClientUtiliti12IsTrackMuteLEi @ 52 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti13PlaybackRateLEv @ 53 NONAME
+	_ZNK18CMidiClientUtiliti13SetTrackMuteLEii @ 54 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti14ChannelVolumeLEi @ 55 NONAME
+	_ZNK18CMidiClientUtiliti14IsChannelMuteLEi @ 56 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti14NumberOfBanksLEi @ 57 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti15InstrumentNameLEiii @ 58 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti16GetInstrumentIdLEiii @ 59 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti16MaxPlaybackRateLEv @ 60 NONAME
+	_ZNK18CMidiClientUtiliti16MinPlaybackRateLEv @ 61 NONAME
+	_ZNK18CMidiClientUtiliti17CustomBankLoadedLEi @ 62 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti17GetMetaDataEntryLEi @ 63 NONAME
+	_ZNK18CMidiClientUtiliti17MaxChannelVolumeLEv @ 64 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti18ChannelsSupportedLEv @ 65 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti18PercussionKeyNameLEiiii @ 66 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti19DurationMicroBeatsLEv @ 67 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti19PositionMicroBeatsLEv @ 68 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti20NumberOfInstrumentsLEii @ 69 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti21DurationMicroSecondsLEv @ 70 NONAME
+	_ZNK18CMidiClientUtiliti21PositionMicroSecondsLEv @ 71 NONAME
+	_ZNK18CMidiClientUtiliti24NumberOfMetaDataEntriesLEv @ 72 NONAME
+	_ZNK18CMidiClientUtiliti24PitchTranspositionCentsLEv @ 73 NONAME
+	_ZNK18CMidiClientUtiliti25TempoMicroBeatsPerMinuteLEv @ 74 NONAME
+	_ZNK18CMidiClientUtiliti5StateEv @ 75 NONAME
+	_ZNK18CMidiClientUtiliti7VolumeLEv @ 76 NONAME ABSENT
+	_ZNK18CMidiClientUtiliti9StopTimeLER25TTimeIntervalMicroSeconds @ 77 NONAME ABSENT
+	_ZTI18CMidiClientUtiliti @ 78 NONAME ABSENT ; #<TI>#
+	_ZTI27CMidiControllerEventMonitor @ 79 NONAME ABSENT ; #<TI>#
+	_ZTI27CRepeatTrailingSilenceTimer @ 80 NONAME ABSENT ; #<TI>#
+	_ZTIN18CMidiClientUtiliti5CBodyE @ 81 NONAME ABSENT ; #<TI>#
+	_ZTV18CMidiClientUtiliti @ 82 NONAME ABSENT ; #<VT>#
+	_ZTV27CMidiControllerEventMonitor @ 83 NONAME ABSENT ; #<VT>#
+	_ZTV27CRepeatTrailingSilenceTimer @ 84 NONAME ABSENT ; #<VT>#
+	_ZTVN18CMidiClientUtiliti5CBodyE @ 85 NONAME ABSENT ; #<VT>#
+	_ZNK18CMidiClientUtiliti13MaxPolyphonyLEv @ 86 NONAME ABSENT
+	_ZN18CMidiClientUtiliti8OpenFileERK5RFile @ 87 NONAME ABSENT
+	_ZN18CMidiClientUtiliti19GetDRMCustomCommandEv @ 88 NONAME ABSENT
+	_ZN18CMidiClientUtiliti8OpenFileERK9TMMSource @ 89 NONAME ABSENT
+	_ZN18CMidiClientUtiliti4NewLER26MMidiClientUtilityObserveri22TMdaPriorityPreferencei @ 90 NONAME
+
