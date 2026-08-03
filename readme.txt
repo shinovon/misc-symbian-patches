@@ -1,3 +1,3 @@
 repo containing bunch of patches for symbian
 
-not for users, visit nnproject.cc instead
+this repo is not for users. visit nnproject.cc instead
