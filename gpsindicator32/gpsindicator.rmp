@@ -1,0 +1,7 @@
+;gps indicator enabler for s60v3.2, test
+;By shinovon
+;12.10.2026
+SnR:sys\bin\sysap.exe:01D0042801D10222:01D0042801D10022
+SnR:sys\bin\sysap.exe:002200212000FEF7:002235212000FEF7
+SnR:sys\bin\sysap.exe:25D1A0680222:25D1A0680022
+SnR:sys\bin\sysap.exe:00220021F1E7:00223521F1E7
