@@ -1,5 +1,5 @@
-;gps indicator enabler for s60v3.2, test
-;By shinovon
+;Replace irda indicator with gps for s60v3.2, use with eposserver.exe patch
+;By shinovon (nnproject.cc)
 ;12.10.2026
 SnR:sys\bin\sysap.exe:01D0042801D10222:01D0042801D10022
 SnR:sys\bin\sysap.exe:002200212000FEF7:002235212000FEF7
