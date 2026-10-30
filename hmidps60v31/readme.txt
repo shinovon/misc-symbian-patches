@@ -11,7 +11,7 @@ replaced "midiclient{000a0000}[101f7d00].dll" import with "midiclien2{000a0000}[
 removed connection filters for 80 and 443 ports access
 
 patch in hex:
-56151: D0 -> E0
+56128-5612F: 06 A8 81 F0 18 EA 05 90 -> 00 00 00 00 00 00 00 20
 8FA88-8FA89: DC 05 -> FF FF
 B19D8: 00 -> 01
 B1AE5: 7A -> 63
