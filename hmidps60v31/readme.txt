@@ -4,7 +4,7 @@ exe extracted from nokia e71, was already epoc format
 
 unpacked
 added -UseVerifier to disable preverification
-added -comp to force AoT and disable JIT
+added -comp to force AoT
 changed z: to c: in bcp arg, to enable adding extra classes to c:\private\102033e6\extensions.jar
 increased bytecode size limit for jit compilation from 1500 to 65535
 replaced "midiclient{000a0000}[101f7d00].dll" import with "midiclien2{000a0000}[201f7d00].dll" wrapper for volume control support
