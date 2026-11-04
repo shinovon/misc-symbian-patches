@@ -18,3 +18,4 @@ nostrictdef
 
 LIBRARY euser.lib
 LIBRARY hal.lib
+LIBRARY etel3rdparty.lib
