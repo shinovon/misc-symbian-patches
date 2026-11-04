@@ -1,6 +1,7 @@
 #include <e32base.h>
 #include <hal.h>
 #include <hal_data.h>
+#include <etel3rdparty.h>
 
 // TODO: uiq3
 
@@ -28,7 +29,26 @@ TDesC* GetDynamicPropertyL(void* self, TDesC16* property) {
 		CleanupStack::Pop();
 		return ret;
 	}
-	if (!property->Compare(_L("asd"))) {
+	if (!property->Compare(_L("com.nokia.mid.batterylevel"))) {
+		CTelephony* telephony = CTelephony::NewLC();
+		CTelephony::TBatteryInfoV1 info;
+		CTelephony::TBatteryInfoV1Pckg infoPkg(info);
+		TRequestStatus status;
+		telephony->GetBatteryInfo(status, infoPkg);
+		User::WaitForRequest(status);
+
+		if (status.Int() != KErrNone) {
+			ret = HBufC16::NewLC(16);
+			TPtr16 des = ret->Des();
+			des.AppendNum(info.iChargeLevel);
+			CleanupStack::Pop();
+			CleanupStack::PopAndDestroy(telephony);
+			return ret;
+		}
+		CleanupStack::PopAndDestroy(telephony);
+		return NULL;
+	}
+	if (!property->Compare(_L("cc.nnproject.asd"))) {
 		ret = HBufC16::NewLC(4);
 		TPtr16 des = ret->Des();
 		des.Append(_L("dsa"));
