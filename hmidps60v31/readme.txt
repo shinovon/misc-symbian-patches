@@ -9,6 +9,7 @@ changed z: to c: in bcp arg, to enable adding extra classes to c:\private\102033
 increased bytecode size limit for jit compilation from 1500 to 65535
 replaced "midiclient{000a0000}[101f7d00].dll" import with "midiclien2{000a0000}[201f7d00].dll" wrapper for volume control support
 removed connection filters for 80 and 443 ports access
+replaced load of midp2runtimev2.dll with midp2runtimev3.dll for custom dynamic system properties
 
 patch in hex:
 56128-5612F: 06 A8 81 F0 18 EA 05 90 -> 00 00 00 00 00 00 00 20
@@ -19,6 +20,7 @@ B1B44-B1B59: 3D 53 74 61 63 6B 53 69 7A 65 49 6E 63 72 65 6D 65 6E 74 35 31 32 -
 B1B7C-B1B83: 4A 61 72 43 61 63 68 65 -> 56 65 72 69 66 69 65 72
 B1B89-B1B9B: 43 61 63 68 65 4A 61 72 46 69 6C 65 48 61 6E 64 6C 65 73 -> 63 6F 6D 70 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 B1D30: 5A -> 43
+236F96: 32 -> 33
 2618BD: 74 -> 32
 2618C9: 21 -> 32
 
@@ -35,4 +37,4 @@ asd1.rmp and asd2.rmp are first attempts to patch extensions.jar path
 
 classpath extensions can not replace existing classes
 
-by shinovon, worked on this on 03.08.2024, 29.04.2025, 03.02.2026, 27.07.2026, 30.10.2026
+by shinovon, worked on this on 03.08.2024, 29.04.2025, 03.02.2026, 27.07.2026, 30.10.2026, 04.11.2026
