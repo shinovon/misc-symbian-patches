@@ -19,3 +19,7 @@ nostrictdef
 LIBRARY euser.lib
 LIBRARY hal.lib
 LIBRARY etel3rdparty.lib
+LIBRARY efsrv.lib
+LIBRARY bafl.lib
+LIBRARY apgrfx.lib
+LIBRARY apparc.lib
