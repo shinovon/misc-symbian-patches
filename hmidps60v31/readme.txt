@@ -29,7 +29,7 @@ see midiclien2dll for midi volume control wrapper sources
 
 sometines needs c2z4bin
 requires copying resources of 102033e6 from z to c
-take midp2runtimev3.dll from midp2runtimev3
+take midp2runtimev3.dll from midp2runtimev3dll
 
 works on e90, e71, n95, n82, е51
 doesn't work on 6120c and maybe on some specific firmware versions too

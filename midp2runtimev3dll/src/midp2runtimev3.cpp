@@ -114,7 +114,7 @@ static HBufC* CheckTlsL() {
 		return res;
 	}
 	
-	// fallback for uiq3
+	// may be installed manually
 	RLibrary lib;
 	if (lib.Load(_L("mbedtls.dll")) == KErrNone) {
 		res = _L("mbedtls").AllocL();
@@ -248,19 +248,22 @@ static HBufC* GetVersionL() {
 	return res;
 }
 
+typedef HBufC* (*TPropertyFunction0)(void*);
+typedef HBufC* (*TPropertyFunction1)(void*, TDesC*);
+
 HBufC* GetDynamicProperty(void* self, TDesC* property) {
 	HBufC* res = NULL;
 #ifndef EKA2
-	if (!property->Compare(_L("microedition.locale"))) {;
-		TRAP_IGNORE(res = (((HBufC* (*)(void*)) ((unsigned int**)self)[0][4]))(self));
-		if (res != NULL) return res->Alloc();
-		return NULL;
-	}
-	if (!property->Compare(_L("microedition.timezone"))) {
-		TRAP_IGNORE(res = (((HBufC* (*)(void*)) ((unsigned int**)self)[0][5]))(self));
-		if (res != NULL) return res->Alloc();
-		return NULL;
-	}
+	if (!property->Compare(_L("microedition.locale"))) {
+			TRAP_IGNORE(res = (*(TPropertyFunction0**)self)[4](self));
+			if (res != NULL) return res->Alloc();
+			return NULL;
+		}
+		if (!property->Compare(_L("microedition.timezone"))) {
+			TRAP_IGNORE(res = (*(TPropertyFunction0**)self)[5](self));
+			if (res != NULL) return res->Alloc();
+			return NULL;
+		}
 #endif
 	if (!property->Compare(_L("com.nokia.memoryramfree"))) {
 		TRAP_IGNORE(res = GetFreeRamL());
@@ -291,8 +294,11 @@ HBufC* GetDynamicProperty(void* self, TDesC* property) {
 		TRAP_IGNORE(res = GetInstalledSisVersionL(property));
 		return res;
 	}
-#endif
+
+	return (*(TPropertyFunction1**)self)[(sizeof_Runtime_vtable >> 2) + 1](self, property);
+#else
 	return NULL;
+#endif
 }
 
 EXPORT_C void* GetRuntimeL() {
@@ -306,6 +312,7 @@ EXPORT_C void* GetRuntimeL() {
 	Mem::Copy(vtable, (void*)runtime[1], sizeof_Runtime_vtable);
 
 #ifdef EKA2
+	vtable[(sizeof_Runtime_vtable >> 2) + 1] = vtable[11]; // store pointer to original function
 	vtable[11] = (unsigned int)GetDynamicProperty;
 #else
 	vtable[16] = (unsigned int)GetDynamicProperty;

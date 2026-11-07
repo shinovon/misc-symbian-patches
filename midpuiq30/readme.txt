@@ -17,6 +17,6 @@ patch in hex:
 1EEDD2: 32 -> 33
 
 
-take midp2runtimev3.dll from midp2runtimev3
+take midp2runtimev3.dll from midp2runtimev3dll
 
 by shinovon, worked on this on 31.10.2026
