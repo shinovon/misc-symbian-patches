@@ -112,7 +112,7 @@ if (uid == null) {
 
 ### `cc.nnproject.symbianext.launchJavaApp:<uid>,<midlet>[,<cmd>]`
 
-Checks if Java application is installed and gets its UID for further launching or getting version
+Launches Java application
 
 Parameters:
 - uid: MIDlet suite UID (decimal, or hexadecimal with 0x)
