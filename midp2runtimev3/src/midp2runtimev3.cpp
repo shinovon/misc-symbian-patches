@@ -10,8 +10,6 @@
 #include <swi/sisregistryentry.h>
 #endif
 
-// TODO: uiq3
-
 #ifdef EKA2
 #define sizeof_Runtime 48
 #define sizeof_Runtime_vtable 64
@@ -99,32 +97,34 @@ static HBufC* GetBatteryLevelL() {
 static HBufC* CheckTlsL() {
 	HBufC* res = NULL;
 #ifdef EKA2
-//	if (BaflUtils::FileExists(fs, _L("Z:\\system\\install\\mbedtls_stub.sis"))) {
-//		res = _L("mbedtls_cfw").AllocL();
-//	} else {
-//		RLibrary lib;
-//		if (lib.Load(_L("mbedtls.dll")) == KErrNone) {
-//			res = _L("mbedtls").AllocL();
-//			
-//			lib.Close();
-//		} else {
-//			res = KFalse().AllocL();
-//		}
-//	}
 	Swi::RSisRegistrySession session;
-	if (session.Connect() == KErrNone) return NULL;
-	CleanupClosePushL(session);
+	if (session.Connect() == KErrNone) {
+		CleanupClosePushL(session);
+		
+		Swi::RSisRegistryEntry entry;
+		CleanupClosePushL(entry);
+		if (entry.Open(session, TUid::Uid(0x20292B6B)) == KErrNone) {
+			res = HBufC16::NewLC(7);
+			res->Des().Append(_L("mbedtls"));
+			CleanupStack::Pop();
+		}
+
+		CleanupStack::PopAndDestroy(); // entry
+		CleanupStack::PopAndDestroy(); // session
+		return res;
+	}
 	
-	Swi::RSisRegistryEntry entry;
-	CleanupClosePushL(entry);
-	if (entry.Open(session, TUid::Uid(0x20292B6B)) == KErrNone) {
-		res = HBufC16::NewLC(7);
-		res->Des().Append(_L("mbedtls"));
+	// fallback for uiq3
+	RLibrary lib;
+	if (lib.Load(_L("mbedtls.dll")) == KErrNone) {
+		res = _L("mbedtls").AllocL();
+		
+		lib.Close();
+	} else {
+		res = HBufC16::NewLC(5);
+		res->Des().Append(KFalse);
 		CleanupStack::Pop();
 	}
-
-	CleanupStack::PopAndDestroy(); // entry
-	CleanupStack::PopAndDestroy(); // session
 #else
 	RFs fs;
 	if (fs.Connect() != KErrNone) return NULL;
