@@ -9,7 +9,7 @@ changed z: to c: in bcp arg, to enable adding extra classes to c:\private\102033
 increased bytecode size limit for jit compilation from 1500 to 65535
 replaced "midiclient{000a0000}[101f7d00].dll" import with "midiclien2{000a0000}[201f7d00].dll" wrapper for volume control support
 removed connection filters for 80 and 443 ports access
-replaced load of midp2runtimev2.dll with midp2runtimev3.dll for custom dynamic system properties
+replaced load of midp2runtimev2.dll with midp2runtimev3.dll wrapper for custom dynamic system properties
 
 patch in hex:
 56128-5612F: 06 A8 81 F0 18 EA 05 90 -> 00 00 00 00 00 00 00 20
@@ -29,6 +29,7 @@ see midiclien2dll for midi volume control wrapper sources
 
 sometines needs c2z4bin
 requires copying resources of 102033e6 from z to c
+take midp2runtimev3.dll from midp2runtimev3
 
 works on e90, e71, n95, n82, е51
 doesn't work on 6120c and maybe on some specific firmware versions too
