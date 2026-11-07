@@ -5,6 +5,7 @@
 #include <bautils.h>
 #include <apgcli.h>
 #include <apacmdln.h>
+#include "mjavaregistry.h"
 #ifdef EKA2
 #include <swi/sisregistrysession.h>
 #include <swi/sisregistryentry.h>
@@ -21,9 +22,14 @@
 _LIT(KIsAppInstalledPrefix, "cc.nnproject.symbianext.isAppInstalled:");
 _LIT(KGetInstalledSisVersionPrefix, "cc.nnproject.symbianext.getInstalledSisVersion:");
 _LIT(KLaunchAppPrefix, "cc.nnproject.symbianext.launchApp:");
+_LIT(KGetJavaAppUidPrefix, "cc.nnproject.symbianext.getJavaAppUid:");
+_LIT(KLaunchJavaAppPrefix, "cc.nnproject.symbianext.launchJavaApp:");
 _LIT(KTrue, "true");
 _LIT(KFalse, "false");
-_LIT(KApiVersion, "0.1");
+_LIT(KApiVersion, "1.0");
+
+typedef HBufC* (*TPropertyFunction0)(void*);
+typedef HBufC* (*TPropertyFunction1)(void*, TDesC*);
 
 static HBufC* GetFreeRamL() {
 	HBufC* res = HBufC::NewLC(16);
@@ -146,9 +152,13 @@ static HBufC* CheckTlsL() {
 
 static HBufC* IsAppInstalledL(TDesC* property) {
 	if ((TUint32)property->Length() <= KIsAppInstalledPrefix.iTypeLength) return NULL;
-	TLex lexer(property->Mid(KIsAppInstalledPrefix.iTypeLength));
+	
+	TDesC param = property->Mid(KIsAppInstalledPrefix.iTypeLength);
 	TUint32 uid;
-	if (lexer.Val(uid, EHex) != KErrNone) return NULL;
+	TLex lexer(param);
+	TBool hex = param.Find(_L("0x")) == 0;
+	if (hex) lexer.Inc(2);
+	if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
 	
 	RApaLsSession ls;
 	User::LeaveIfError(ls.Connect());
@@ -173,9 +183,13 @@ static HBufC* IsAppInstalledL(TDesC* property) {
 #ifdef EKA2
 static HBufC* GetInstalledSisVersionL(TDesC* property) {
 	if ((TUint32)property->Length() <= KGetInstalledSisVersionPrefix.iTypeLength) return NULL;
-	TLex lexer(property->Mid(KGetInstalledSisVersionPrefix.iTypeLength));
+	
+	TDesC param = property->Mid(KGetInstalledSisVersionPrefix.iTypeLength);
 	TUint32 uid;
-	if (lexer.Val(uid, EHex) != KErrNone) return NULL;
+	TLex lexer(param);
+	TBool hex = param.Find(_L("0x")) == 0;
+	if (hex) lexer.Inc(2);
+	if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
 	
 	Swi::RSisRegistrySession session;
 	CleanupClosePushL(session);
@@ -208,9 +222,15 @@ static HBufC* GetInstalledSisVersionL(TDesC* property) {
 
 static HBufC* LaunchAppL(TDesC* property) {
 	if ((TUint32)property->Length() <= KLaunchAppPrefix.iTypeLength) return NULL;
-	TLex lexer(property->Mid(KLaunchAppPrefix.iTypeLength));
+	
+	TPtrC16 param = property->Mid(KLaunchAppPrefix.iTypeLength);
+	TInt commaIdx = param.Locate(',');
+
 	TUint32 uid;
-	if (lexer.Val(uid, EHex) != KErrNone) return NULL;
+	TBool hex = param.Find(_L("0x")) == 0;
+	TLex lexer(commaIdx != -1 ? param.Left(commaIdx) : param);
+	if (hex) lexer.Inc(2);
+	if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
 	
 	RApaLsSession ls;
 	User::LeaveIfError(ls.Connect());
@@ -221,6 +241,9 @@ static HBufC* LaunchAppL(TDesC* property) {
 	if (ls.GetAppInfo(appInfo, TUid::Uid(uid)) == KErrNone) {
 		CApaCommandLine* cli = CApaCommandLine::NewLC();
 		cli->SetExecutableNameL(appInfo.iFullName);
+		if (commaIdx != -1) {
+			cli->SetDocumentNameL(param.Mid(commaIdx + 1));
+		}
 		if (ls.StartApp(*cli) == KErrNone) {
 			res = HBufC16::NewLC(4);
 			res->Des().Append(KTrue);
@@ -248,8 +271,112 @@ static HBufC* GetVersionL() {
 	return res;
 }
 
-typedef HBufC* (*TPropertyFunction0)(void*);
-typedef HBufC* (*TPropertyFunction1)(void*, TDesC*);
+static HBufC* GetJavaAppUidL(TDesC* property) {
+	if ((TUint32)property->Length() <= KGetJavaAppUidPrefix.iTypeLength) return NULL;
+	
+	TPtrC16 param = property->Mid(KGetJavaAppUidPrefix.iTypeLength);
+	TInt commaIdx = param.Locate(',');
+	
+	if (commaIdx == -1) return NULL;
+	TDesC name = param.Left(commaIdx);
+	TDesC vendor = param.Mid(commaIdx + 1);
+	
+	HBufC* res = NULL;
+	RLibrary lib;
+	if (lib.Load(_L("javaregistry.dll")) != KErrNone) {
+		return NULL;
+	}
+	
+#ifdef EKA2
+	void* func = (void*) lib.Lookup(5);
+#else
+	void* func = (void*) lib.Lookup(3);
+#endif
+	if (func != NULL) {
+		MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
+		MJavaRegistrySuiteEntry* entry = NULL;
+		TRAPD(err, entry = registry->SuiteEntryL(name, vendor));
+		if (err == KErrNone && entry != NULL) {
+			res = HBufC16::NewLC(16);
+			res->Des().Append(_L("0x"));
+			res->Des().AppendNum(entry->UidL().iUid, EHex);
+			CleanupStack::Pop();
+		}
+		registry->Release();
+	}
+	
+	lib.Close();
+	return res;
+}
+
+static HBufC* LaunchJavaAppL(TDesC* property) {
+	if ((TUint32)property->Length() <= KLaunchJavaAppPrefix.iTypeLength) return NULL;
+	
+	TPtrC16 param = property->Mid(KLaunchJavaAppPrefix.iTypeLength);
+	TInt commaIdx = param.Locate(',');
+	
+	if (commaIdx == -1) return NULL;
+	TDesC uidDes = param.Left(commaIdx);
+	TDesC midletIdDes = param.Mid(commaIdx + 1);
+	TDesC cmd = KNullDesC;
+	
+	commaIdx = param.Locate(',');
+	if (commaIdx != -1) {
+		midletIdDes = midletIdDes.Left(commaIdx);
+		cmd = midletIdDes.Mid(commaIdx + 1);
+	}
+	
+	TUint32 uid;
+	{
+		TBool hex = uidDes.Find(_L("0x")) == 0;
+		TLex lexer(uidDes);
+		if (hex) lexer.Inc(2);
+		if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
+	}
+	TUint32 midletId;
+	{
+		TLex lexer(midletIdDes);
+		if (lexer.Val(midletId, EDecimal) != KErrNone) return NULL;
+	}
+	
+	HBufC* res = NULL;
+	RLibrary lib;
+	if (lib.Load(_L("midp2client.dll")) != KErrNone) {
+		return NULL;
+	}
+	
+#ifdef EKA2
+	void* disconnectFunc = (void*) lib.Lookup(1);
+	void* connectFunc = (void*) lib.Lookup(4);
+#else
+	void* disconnectFunc = (void*) lib.Lookup(2);
+	void* connectFunc = (void*) lib.Lookup(1);
+#endif
+	void* launchFunc = (void*) lib.Lookup(6);
+	
+	if (disconnectFunc != NULL && connectFunc != NULL && launchFunc != NULL) {
+		int midpClient[4]; // exact size is unknown
+		
+		if (((int (*)(void*))connectFunc)(&midpClient) == KErrNone) {
+			HBufC* cmdBuf = cmd.Alloc();
+			if (((int (*)(void*, int, int, HBufC*, int))launchFunc)(&midpClient, uid, midletId, cmdBuf, 0) == KErrNone) {
+				res = HBufC16::NewLC(4);
+				res->Des().Append(KTrue);
+				CleanupStack::Pop();
+			} else {
+				res = HBufC16::NewLC(5);
+				res->Des().Append(KFalse);
+				CleanupStack::Pop();
+			}
+			delete cmdBuf;
+			
+			((int (*)(void*))disconnectFunc)(&midpClient);
+		}
+	}
+
+	lib.Close();
+	return res;
+}
 
 HBufC* GetDynamicProperty(void* self, TDesC* property) {
 	HBufC* res = NULL;
@@ -287,6 +414,14 @@ HBufC* GetDynamicProperty(void* self, TDesC* property) {
 	}
 	if (property->Find(KLaunchAppPrefix) == 0) {
 		TRAP_IGNORE(res = LaunchAppL(property));
+		return res;
+	}
+	if (property->Find(KGetJavaAppUidPrefix) == 0) {
+		TRAP_IGNORE(res = GetJavaAppUidL(property));
+		return res;
+	}
+	if (property->Find(KLaunchJavaAppPrefix) == 0) {
+		TRAP_IGNORE(res = LaunchJavaAppL(property));
 		return res;
 	}
 #ifdef EKA2

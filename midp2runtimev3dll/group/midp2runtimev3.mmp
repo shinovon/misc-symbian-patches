@@ -9,7 +9,12 @@ ARMFPU softvfp
 #endif
 
 SYSTEMINCLUDE \epoc32\include
+#ifdef EKA2
+SYSTEMINCLUDE \epoc32\include\mw
 SYSTEMINCLUDE \epoc32\include\platform
+SYSTEMINCLUDE \epoc32\include\platform\mw
+#endif
+USERINCLUDE ..\inc
 
 SOURCEPATH ..\src
 SOURCE midp2runtimev3.cpp
@@ -23,3 +28,6 @@ LIBRARY efsrv.lib
 LIBRARY bafl.lib
 LIBRARY apgrfx.lib
 LIBRARY apparc.lib
+#ifdef EKA2
+LIBRARY sisregistryclient.lib
+#endif
