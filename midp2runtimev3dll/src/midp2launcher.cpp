@@ -71,7 +71,7 @@ static MDatabase* GetDatabaseL(RLibrary& lib, TUint32 a) {
 	return ((MDatabase* (*)(TUint32)) func)(a);
 }
 
-TInt GetIdL(TDesC aName, TDesC aVendor) {
+TInt GetIdL(TPtrC aName, TPtrC aVendor) {
 	const TUint32 KDBVersion = 0x0100;
 
 	RLibrary lib;
@@ -106,30 +106,6 @@ TInt GetIdL(TDesC aName, TDesC aVendor) {
 
 TInt RunL(TPtrC param) {
 	TInt res = 0;
-	
-//	TUint32 uid;
-//	TInt midletId;
-//	{
-//		TInt idx = cmd.Locate(' ');
-//		if (idx == -1) return -101;
-//		{
-//			TPtrC uidDes = cmd.Left(idx);
-//			cmd.Set(cmd.Mid(idx + 1));
-//				
-//			TLex lex(uidDes);
-//			if (lex.Val(uid, EHex) != KErrNone) return -102;
-//		}
-//
-//		idx = cmd.Locate(' ');
-//		if (idx == -1) return -103;
-//		{
-//			TPtrC numDes = cmd.Left(idx);
-//			cmd.Set(cmd.Mid(idx + 1));
-//				
-//			TLex lex(numDes);
-//			if (lex.Val(midletId) != KErrNone) return -104;
-//		}
-//	}
 	
 	TInt commaIdx = param.Locate(',');
 		
@@ -221,5 +197,4 @@ TInt E32Main() {
 	delete cleanup;
 	
 	return res;
-//return 0;
 }
