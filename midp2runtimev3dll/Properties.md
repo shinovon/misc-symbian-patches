@@ -55,7 +55,7 @@ Parameters:
 - uid: Application UID (decimal, or hexadecimal with 0x)
 - document: ApaCommandLine document path, optional
 
-Returns true if launch was successful, false if app is not found
+Returns true if launch was successful, false if application was not found
 
 Example:
 ```
@@ -82,41 +82,40 @@ Example:
 String version = System.getProperty("cc.nnproject.symbianext.getInstalledSisVersion:20292b6b");
 if (version == null) {
     // not installed...
-} else if (splitString(version, '.')[1] < 4) {
+} else if (parseVersion(version)[1] < 4) {
     // ask user to update...
 }
 ```
 
 ---
 
-### `cc.nnproject.symbianext.getJavaAppUid:<name>,<vendor>`
+### `cc.nnproject.symbianext.getMidletSuiteVersion:<name>,<vendor>`
 
-Checks if Java application is installed and gets its UID for further launching or getting version
+Gets version of installed Java application
 
 Parameters:
 - name: MIDlet suite name
 - vendor: MIDlet suite vendor
 
-Returns MIDlet suite UID if application is installed, null otherwise
+Returns version in <major>.<minor>.<build> format if MIDlet suite is found, null otherwise
 
 Example:
 ```
-// Get MPGram UID
-String uid = System.getProperty("cc.nnproject.symbianext.getJavaAppUid:MPGram,nnproject");
-if (uid == null) {
+if (System.getProperty("cc.nnproject.symbianext.getMidletSuiteVersion:MPGram,nnproject") == null) {
     // not installed...
 }
 ```
 
 ---
 
-### `cc.nnproject.symbianext.launchJavaApp:<uid>,<midlet>[,<cmd>]`
+### `cc.nnproject.symbianext.launchMidlet:<name>,<vendor>,<num>,[<midlet>[,<cmd>]]`
 
 Launches Java application
 
 Parameters:
-- uid: MIDlet suite UID (decimal, or hexadecimal with 0x)
-- midlet: MIDlet ID
+- name: MIDlet suite name
+- vendor: MIDlet suite vendor
+- num: MIDlet number starting from 1, optional
 - cmd: Command line arguments, optional
 
 Returns true if launch was successful, false otherwise
@@ -124,8 +123,7 @@ Returns true if launch was successful, false otherwise
 Example:
 ```
 // Launch MPGram
-String uid = System.getProperty("cc.nnproject.symbianext.getJavaAppUid:MPGram,nnproject");
-if (uid != null && "true".equals(System.getProperty("cc.nnproject.symbianext.launchJavaApp:" + uid + ",1,-Dasd=dsa"))) {
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,nnproject,1,-Dasd=dsa"))) {
     // ...
 }
 ```
@@ -134,7 +132,7 @@ if (uid != null && "true".equals(System.getProperty("cc.nnproject.symbianext.lau
 
 ### `com.nokia.memoryramfree`
 
-Returns amount of free RAM in bytes, ported from S60v3 FP1
+Returns amount of free RAM in bytes, mimics S60v3 FP2 behavior
 
 Check Java Developers Library for documentation
 
@@ -142,7 +140,7 @@ Check Java Developers Library for documentation
 
 ### `com.nokia.mid.batterylevel`
 
-Returns battery charge level 0-100, ported from S60v3 FP1
+Returns battery charge level 0-100, mimics S60v3 FP2 behavior
 
 Check Java Developers Library for documentation
 

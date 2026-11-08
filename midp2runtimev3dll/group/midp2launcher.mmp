@@ -1,0 +1,22 @@
+TARGET midp2applauncher.exe
+TARGETTYPE exe
+VENDORID 0x70000001
+SECUREID 0x10208DDD
+
+#ifdef EKA2
+CAPABILITY ALL -TCB
+ARMFPU softvfp
+#endif
+
+SYSTEMINCLUDE \epoc32\include
+#ifdef EKA2
+SYSTEMINCLUDE \epoc32\include\mw
+SYSTEMINCLUDE \epoc32\include\platform
+SYSTEMINCLUDE \epoc32\include\platform\mw
+#endif
+USERINCLUDE ..\inc
+
+SOURCEPATH ..\src
+SOURCE midp2launcher.cpp
+
+LIBRARY euser.lib
