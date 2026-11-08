@@ -1,5 +1,7 @@
 # Custom properties
 
+## Helpers
+
 ### `cc.nnproject.symbianext.version`
 
 Returns version of midp2runtimev2.dll extension
@@ -29,65 +31,8 @@ if (s != null && !s.equals("false")) {
 
 ---
 
-### `cc.nnproject.symbianext.isAppInstalled:<uid>`
 
-Checks if Symbian application is installed
-
-uid: Application UID (decimal, or hexadecimal with 0x)
-
-Returns true if application is runnable, false otherwise
-
-Example:
-```
-// Is ClassiCube installed
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppInstalled:e212a5c2"))) {
-    // ...
-}
-```
-
----
-
-### `cc.nnproject.symbianext.launchApp:<uid>[,<document>]`
-
-Launches Symbian application by UID
-
-Parameters:
-- uid: Application UID (decimal, or hexadecimal with 0x)
-- document: ApaCommandLine document path, optional
-
-Returns true if launch was successful, false if application was not found
-
-Example:
-```
-// Launch S60 browser
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:10008d39"))) {
-    // ...
-}
-```
-
----
-
-### `cc.nnproject.symbianext.getInstalledSisVersion:<uid>`
-
-Checks if SIS package is installed, only for EKA2
-
-Parameters:
-- uid: SIS package UID (decimal, or hexadecimal with 0x)
-
-Returns version in <major>.<minor>.<build> format if SIS package is installed, null otherwise
-
-Example:
-```
-// MBedTLS library
-String version = System.getProperty("cc.nnproject.symbianext.getInstalledSisVersion:20292b6b");
-if (version == null) {
-    // not installed...
-} else if (parseVersion(version)[1] < 4) {
-    // ask user to update...
-}
-```
-
----
+## Java applications
 
 ### `cc.nnproject.symbianext.getMidletSuiteVersion:<name>,<vendor>`
 
@@ -123,12 +68,153 @@ Returns 0 if launch was successful
 Example:
 ```
 // Launch MPGram
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,nnproject,1,-Dasd=dsa"))) {
+if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,nnproject,1,-Dasd=dsa -Ddsa=asd"))) {
     // ...
 }
 ```
 
 ---
+
+### `cc.nnproject.symbianext.getMidletUid:<name>,<vendor>[,<num>]]`
+
+Gets registered UID of Java application, can be used for isAppRunning, bringAppToForeground
+
+FUTURE
+
+Parameters:
+- name: MIDlet suite name
+- vendor: MIDlet suite vendor
+- num: MIDlet number starting from 1, optional
+
+Returns application UID
+
+Example:
+```
+// Launch MPGram
+String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:MPGram,nnproject,1");
+```
+
+---
+
+
+
+## Symbian applications
+
+### `cc.nnproject.symbianext.isAppInstalled:<uid>`
+
+Checks if Symbian application is installed
+
+uid: Application UID (decimal, or hexadecimal with 0x)
+
+Returns true if application is runnable, false otherwise
+
+Example:
+```
+// Is ClassiCube installed
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppInstalled:e212a5c2"))) {
+    // ...
+}
+```
+
+---
+
+### `cc.nnproject.symbianext.isAppRunning:<uid>`
+
+Checks if application is running
+
+FUTURE
+
+Parameters:
+- uid: Application UID (decimal, or hexadecimal with 0x)
+
+Returns true if application is running, false otherwise
+
+Example:
+```
+// Is X-Plore running
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:a0000bcd"))) {
+    // ...
+}
+```
+
+---
+
+### `cc.nnproject.symbianext.launchApp:<uid>[,<document>]`
+
+Launches Symbian application by UID
+
+Parameters:
+- uid: Application UID (decimal, or hexadecimal with 0x)
+- document: ApaCommandLine document path, optional
+
+Returns true if launch was successful, false if application was not found
+
+Example:
+```
+// Launch X-Plore
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:a0000bcd"))) {
+    // ...
+}
+```
+
+---
+
+### `cc.nnproject.symbianext.bringAppToForeground:<uid>`
+
+Brings application to foreground if it is running
+
+FUTURE
+
+Parameters:
+- name: MIDlet suite name
+- vendor: MIDlet suite vendor
+- num: MIdlet number starting from 1, optional
+
+Returns true if operation was successful, false otherwise
+
+Example:
+```
+String xploreUid = "a0000bcd";
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:" + xploreUid))) {
+    if ("true".equals(System.getProperty("cc.nnproject.symbianext.bringAppToForeground:" + xploreUid))) {
+        // ...
+    }
+} else if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:" + xploreUid))) {
+    // ...
+}
+```
+
+---
+
+
+
+## SIS registry
+
+### `cc.nnproject.symbianext.getInstalledSisVersion:<uid>`
+
+Checks if SIS package is installed, only for EKA2
+
+Parameters:
+- uid: SIS package UID (decimal, or hexadecimal with 0x)
+
+Returns version in <major>.<minor>.<build> format if SIS package is installed, null otherwise
+
+Example:
+```
+// MBedTLS library
+String version = System.getProperty("cc.nnproject.symbianext.getInstalledSisVersion:20292b6b");
+if (version == null) {
+    // not installed...
+} else if (parseVersion(version)[1] < 4) {
+    // ask user to update...
+}
+```
+
+---
+
+
+
+## Nokia extensions
 
 ### `com.nokia.memoryramfree`
 
