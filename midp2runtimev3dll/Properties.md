@@ -1,7 +1,5 @@
 # Custom properties
 
-## Helpers
-
 ### `cc.nnproject.symbianext.version`
 
 Returns version of midp2runtimev2.dll extension
@@ -14,6 +12,8 @@ if (System.getProperty("cc.nnproject.symbianext.version") != null) {
 ```
 
 ---
+
+## Helpers
 
 ### `cc.nnproject.symbianext.checkTLS12`
 
@@ -60,7 +60,7 @@ Launches Java application
 Parameters:
 - name: MIDlet suite name
 - vendor: MIDlet suite vendor
-- num: MIDlet number starting from 1, optional
+- num: MIDlet number starting from 1, defaults to 1 if not specified
 - cmd: Command line arguments, optional
 
 Returns 0 if launch was successful
@@ -84,7 +84,7 @@ FUTURE
 Parameters:
 - name: MIDlet suite name
 - vendor: MIDlet suite vendor
-- num: MIDlet number starting from 1, optional
+- num: MIDlet number starting from 1, defaults to 1 if not specified
 
 Returns application UID
 
@@ -159,27 +159,27 @@ if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:a0000bcd
 
 ---
 
-### `cc.nnproject.symbianext.bringAppToForeground:<uid>`
+### `cc.nnproject.symbianext.bringAppToForeground:<uid>[,<message>,<data>]`
 
-Brings application to foreground if it is running
+Brings application to foreground if it is running, optionally sends a message.
 
 FUTURE
 
 Parameters:
-- name: MIDlet suite name
-- vendor: MIDlet suite vendor
-- num: MIdlet number starting from 1, optional
+- uid: Application UID (decimal, or hexadecimal with 0x)
+- message: Message UID (decimal), optional
+- data: Message parameters (non-Unicode), optional
 
 Returns true if operation was successful, false otherwise
 
 Example:
 ```
-String xploreUid = "a0000bcd";
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:" + xploreUid))) {
-    if ("true".equals(System.getProperty("cc.nnproject.symbianext.bringAppToForeground:" + xploreUid))) {
+String browserUid = "10008d39";
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:" + browserUid))) {
+    if ("true".equals(System.getProperty("cc.nnproject.symbianext.bringAppToForeground:" + browserUid + ",0,http://nnproject.cc/"))) {
         // ...
     }
-} else if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:" + xploreUid))) {
+} else if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:" + browserUid + ",http://nnproject.cc/"))) {
     // ...
 }
 ```
