@@ -42,7 +42,7 @@ Parameters:
 - name: MIDlet suite name
 - vendor: MIDlet suite vendor
 
-Returns version in <major>.<minor>.<build> format if MIDlet suite is found, null otherwise
+Returns version in `<major>.<minor>.<build>` format if MIDlet suite is found, null otherwise
 
 Example:
 ```
@@ -197,7 +197,7 @@ Checks if SIS package is installed, only for EKA2
 Parameters:
 - uid: SIS package UID (decimal, or hexadecimal with 0x)
 
-Returns version in <major>.<minor>.<build> format if SIS package is installed, null otherwise
+Returns version in `<major>.<minor>.<build>` format if SIS package is installed, null otherwise
 
 Example:
 ```
