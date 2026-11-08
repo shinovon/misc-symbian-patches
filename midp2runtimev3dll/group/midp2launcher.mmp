@@ -1,10 +1,13 @@
-TARGET midp2applauncher.exe
+TARGET midp2launcher.exe
 TARGETTYPE exe
+UID	0 0x20201CCA
 VENDORID 0x70000001
 SECUREID 0x10208DDD
 
+EPOCSTACKSIZE 0x10000
+
 #ifdef EKA2
-CAPABILITY ALL -TCB
+CAPABILITY ProtServ TrustedUI NetworkServices WriteDeviceData NetworkControl
 ARMFPU softvfp
 #endif
 
@@ -20,3 +23,4 @@ SOURCEPATH ..\src
 SOURCE midp2launcher.cpp
 
 LIBRARY euser.lib
+LIBRARY edbms.lib

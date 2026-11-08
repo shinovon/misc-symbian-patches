@@ -108,7 +108,7 @@ if (System.getProperty("cc.nnproject.symbianext.getMidletSuiteVersion:MPGram,nnp
 
 ---
 
-### `cc.nnproject.symbianext.launchMidlet:<name>,<vendor>,<num>,[<midlet>[,<cmd>]]`
+### `cc.nnproject.symbianext.launchMidlet:<name>,<vendor>[,<num>[,<cmd>]]`
 
 Launches Java application
 
@@ -118,7 +118,7 @@ Parameters:
 - num: MIDlet number starting from 1, optional
 - cmd: Command line arguments, optional
 
-Returns true if launch was successful, false otherwise
+Returns 0 if launch was successful
 
 Example:
 ```

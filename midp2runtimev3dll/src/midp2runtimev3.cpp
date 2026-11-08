@@ -6,6 +6,8 @@
 #include <apgcli.h>
 #include <apacmdln.h>
 #include <apgicnfl.h>
+#include <apgtask.h>
+#include <barsc.h>
 #include "mjavaregistry.h"
 #include "appversion.h"
 #ifdef EKA2
@@ -163,7 +165,7 @@ static HBufC* IsAppInstalledL(TDesC* property) {
 		TLex lexer(param);
 		TBool hex = param.Find(_L("0x")) == 0;
 		if (hex) lexer.Inc(2);
-		if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
+		if (lexer.Val(uid, hex ? EHex : EDecimal) != KErrNone) return NULL;
 	}
 	
 	RApaLsSession ls;
@@ -236,15 +238,41 @@ static void LaunchAppUidL(TUid uid, const TDesC& doc = KNullDesC) {
 	TApaAppInfo appInfo;
 	User::LeaveIfError(ls.GetAppInfo(appInfo, uid));
 	
-	CApaCommandLine* cli = CApaCommandLine::NewLC();
-	cli->SetExecutableNameL(appInfo.iFullName);
 	if (doc.Length() != 0) {
-		cli->SetDocumentNameL(doc);
+		TThreadId tid;
+		ls.StartDocument(doc, uid, tid);
+	} else {
+		CApaCommandLine* cli = CApaCommandLine::NewLC();
+		cli->SetExecutableNameL(appInfo.iFullName);
+//		if (doc.Length() != 0) {
+//			cli->SetDocumentNameL(doc);
+//		}
+		User::LeaveIfError(ls.StartApp(*cli));
+		CleanupStack::PopAndDestroy(); // cli
 	}
-	User::LeaveIfError(ls.StartApp(*cli));
-	CleanupStack::PopAndDestroy(); // cli
 
 	CleanupStack::PopAndDestroy(); // ls
+////		RWsSession 		ws;
+////		User::LeaveIfError(ws.Connect());
+////		CleanupClosePushL( ws );
+////			
+////		TApaTaskList tasklist(ws);
+////		TApaTask task = tasklist.FindApp(uid);
+////
+////		if (task.Exists()) {
+////			task.BringToForeground();
+////			task.SendMessage(TUid::Uid(0), doc);
+////		} else {
+//		RApaLsSession ls;
+//		User::LeaveIfError(ls.Connect());
+//		CleanupClosePushL(ls);
+//
+//		TThreadId tid;
+//		ls.StartDocument(doc, uid, tid);
+//		
+//		CleanupStack::PopAndDestroy(); // ls
+////		}
+////		CleanupStack::PopAndDestroy(); // ws
 }
 
 static HBufC* LaunchAppL(TDesC* property) {
@@ -382,10 +410,10 @@ static HBufC* LaunchMidletL(TDesC* property) {
 			TRAP(err, midlet = suite->MIDletByNumberL(midletId));
 			if (err != KErrNone || midlet == NULL) goto ret2;
 			
-//			TUid uid;
-//			TRAP(err, uid = midlet->UidL());
-//			if (err != KErrNone) goto ret2;
-//			
+			TUid uid = TUid::Null();
+			TRAP(err, uid = midlet->UidL());
+			if (err != KErrNone) goto ret2;
+			
 //			TRAP(err, LaunchAppUidL(uid));
 //			if (err == KErrNone) {
 //				res = HBufC16::NewLC(4);
@@ -397,22 +425,16 @@ static HBufC* LaunchMidletL(TDesC* property) {
 //				CleanupStack::Pop();
 //			}
 			
-			HBufC* runcmd = NULL;
-			TRAP(err, runcmd = HBufC::NewL(param.Length() + 32));
-			if (err != KErrNone || runcmd == NULL) goto ret2;
-			
-			
-			TPtr des = runcmd->Des();
-			des.AppendFormat(_L("%x %d "), suite->UidL().iUid, midletId);
-			des.Append(cmd);
+//			HBufC* runcmd = NULL;
+//			TRAP(err, runcmd = HBufC::NewL(param.Length() + 32));
+//			if (err != KErrNone || runcmd == NULL) goto ret2;			
+//			TPtr des = runcmd->Des();
+//			des.AppendFormat(_L("%x %d "), suite->UidL().iUid, midletId);
+//			des.Append(cmd);
 			
 			RProcess process;
-			if (process.Create(_L("midp2launcher.exe"), des) != KErrNone) {
-				res = HBufC16::NewLC(10);
-				res->Des().Append(_L("aa"));
-				CleanupStack::Pop();
-				goto ret2;
-			}
+//			if (process.Create(_L("midp2launcher.exe"), des) != KErrNone) goto ret2;
+			if (process.Create(_L("midp2launcher.exe"), param) != KErrNone) goto ret2;
 			
 			TRequestStatus status;
 			process.Logon(status);
@@ -427,7 +449,7 @@ static HBufC* LaunchMidletL(TDesC* property) {
 //			}
 				
 			process.Close();
-			delete runcmd;
+//			delete runcmd;
 		}
 		
 		ret2:
