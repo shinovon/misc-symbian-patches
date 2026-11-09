@@ -8,6 +8,7 @@
 #include <apgicnfl.h>
 #include <apgtask.h>
 #include <barsc.h>
+#include <w32std.h>
 #include "mjavaregistry.h"
 #include "appversion.h"
 #ifdef EKA2
@@ -26,10 +27,11 @@
 _LIT(KIsAppInstalledPrefix, "cc.nnproject.symbianext.isAppInstalled:");
 _LIT(KGetInstalledSisVersionPrefix, "cc.nnproject.symbianext.getInstalledSisVersion:");
 _LIT(KLaunchAppPrefix, "cc.nnproject.symbianext.launchApp:");
-//_LIT(KGetMidletSuiteUidPrefix, "cc.nnproject.symbianext.getMidletSuiteUid:");
-//_LIT(KGetJavaAppUidPrefix, "cc.nnproject.symbianext.getMidletUid:");
+_LIT(KGetMidletUidPrefix, "cc.nnproject.symbianext.getMidletUid:");
 _LIT(KLaunchMidletPrefix, "cc.nnproject.symbianext.launchMidlet:");
 _LIT(KGetMidletSuiteVersionPrefix, "cc.nnproject.symbianext.getMidletSuiteVersion:");
+_LIT(KIsAppRunningPrefix, "cc.nnproject.symbianext.isAppRunning:");
+_LIT(KBringAppToForegroundPrefix, "cc.nnproject.symbianext.bringAppToForeground:");
 _LIT(KTrue, "true");
 _LIT(KFalse, "false");
 _LIT(KApiVersion, "1.0");
@@ -191,6 +193,70 @@ static HBufC* IsAppInstalledL(TDesC* aProperty) {
 	return res;
 }
 
+static HBufC* IsAppRunningL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KIsAppRunningPrefix.iTypeLength) return NULL;
+	
+	TUint32 uid;
+	if (!ParseInt(aProperty->Mid(KIsAppRunningPrefix.iTypeLength), uid)) {
+		return NULL;
+	}
+	
+	RWsSession ws;
+	User::LeaveIfError(ws.Connect());
+	CleanupClosePushL(ws);
+		
+	TApaTaskList tasklist(ws);
+	TApaTask task = tasklist.FindApp(TUid::Uid(uid));
+
+	HBufC* res = NULL;
+	if (task.Exists()) {
+		res = HBufC16::NewLC(4);
+		res->Des().Append(KTrue);
+		CleanupStack::Pop();
+	} else {
+		res = HBufC16::NewLC(5);
+		res->Des().Append(KFalse);
+		CleanupStack::Pop();
+	}
+
+	CleanupStack::PopAndDestroy(); // ws
+	return res;
+}
+
+static HBufC* BringAppToForegroundL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KBringAppToForegroundPrefix.iTypeLength) return NULL;
+	
+	TUint32 uid;
+	if (!ParseInt(aProperty->Mid(KBringAppToForegroundPrefix.iTypeLength), uid)) {
+		return NULL;
+	}
+	
+	RWsSession ws;
+	User::LeaveIfError(ws.Connect());
+	CleanupClosePushL(ws);
+		
+	TApaTaskList tasklist(ws);
+	TApaTask task = tasklist.FindApp(TUid::Uid(uid));
+
+	HBufC* res = NULL;
+	if (task.Exists()) {
+		task.BringToForeground();
+		// TODO
+//		task.SendMessage(TUid::Uid(0), doc);
+		
+		res = HBufC16::NewLC(4);
+		res->Des().Append(_L("true"));
+		CleanupStack::Pop();
+	} else {
+		res = HBufC16::NewLC(5);
+		res->Des().Append(_L("false")); // not found
+		CleanupStack::Pop();
+	}
+
+	CleanupStack::PopAndDestroy(); // ws
+	return res;
+}
+
 #ifdef EKA2
 static HBufC* GetInstalledSisVersionL(TDesC* aProperty) {
 	if ((TUint32)aProperty->Length() <= KGetInstalledSisVersionPrefix.iTypeLength) return NULL;
@@ -225,7 +291,7 @@ static HBufC* GetInstalledSisVersionL(TDesC* aProperty) {
 }
 #endif
 
-static void LaunchAppUidL(TUid aUid, const TDesC& aDoc = KNullDesC) {
+static void DoLaunchAppUidL(TUid aUid, const TDesC& aDoc = KNullDesC) {
 	RApaLsSession ls;
 	User::LeaveIfError(ls.Connect());
 	CleanupClosePushL(ls);
@@ -288,7 +354,7 @@ static HBufC* LaunchAppL(TDesC* aProperty) {
 		}
 	}
 
-	TRAPD(err, LaunchAppUidL(TUid::Uid(uid), doc));
+	TRAPD(err, DoLaunchAppUidL(TUid::Uid(uid), doc));
 	
 	HBufC* res = res = HBufC16::NewLC(16);
 	res->Des().AppendNum((TInt)err);
@@ -342,6 +408,58 @@ static HBufC* GetMidletSuiteVersionL(TDesC* aProperty) {
 	des.AppendNum((TInt)version.iMinor);
 	des.Append('.');
 	des.AppendNum((TInt)version.iBuild);
+	CleanupStack::Pop();
+	
+	CleanupStack::PopAndDestroy(); // registry
+	CleanupStack::PopAndDestroy(); // lib
+	
+	return res;
+}
+
+static HBufC* GetMidletUidL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KGetMidletUidPrefix.iTypeLength) return NULL;
+	
+	TPtrC param = aProperty->Mid(KGetMidletUidPrefix.iTypeLength);
+	TInt commaIdx = param.Locate(',');
+	
+	if (commaIdx == -1) return NULL;
+	TPtrC name = param.Left(commaIdx);
+	TPtrC vendor = param.Mid(commaIdx + 1);
+	TUint32 midletId = 1;
+	
+	commaIdx = vendor.Locate(',');
+	if (commaIdx != -1) {
+		TPtrC midletIdDes = vendor.Mid(commaIdx + 1);
+		vendor.Set(vendor.Left(commaIdx));
+		
+		TLex lexer(midletIdDes);
+		if (lexer.Val(midletId, EDecimal) != KErrNone) return NULL;
+	}
+	
+	HBufC* res = NULL;
+	RLibrary lib;
+	if (lib.Load(_L("javaregistry.dll")) != KErrNone) {
+		return NULL;
+	}
+	CleanupClosePushL(lib);
+	
+#ifdef EKA2
+	void* func = (void*) lib.Lookup(5);
+#else
+	void* func = (void*) lib.Lookup(3);
+#endif
+	if (!func) User::Leave(KErrNotSupported);
+	
+	MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
+	User::LeaveIfNull(registry);
+	CleanupReleasePushL(*registry);
+
+	MJavaRegistrySuiteEntry* suite = registry->SuiteEntryL(name, vendor);
+	MJavaRegistryMIDletEntry* midlet = suite->MIDletByNumberL(midletId);
+	TUid uid = midlet->UidL();
+
+	res = HBufC16::NewLC(16);
+	res->Des().AppendFormat(_L("0x%x"), midlet->UidL().iUid);
 	CleanupStack::Pop();
 	
 	CleanupStack::PopAndDestroy(); // registry
@@ -459,16 +577,24 @@ HBufC* GetDynamicProperty(void* aThis, TDesC* aProperty) {
 		TRAP_IGNORE(res = LaunchAppL(aProperty));
 		return res;
 	}
-//	if (aProperty->Find(KGetMidletSuiteUidPrefix) == 0) {
-//		TRAP_IGNORE(res = GetMidletSuiteUidL(aProperty));
-//		return res;
-//	}
+	if (aProperty->Find(KGetMidletUidPrefix) == 0) {
+		TRAP_IGNORE(res = GetMidletUidL(aProperty));
+		return res;
+	}
 	if (aProperty->Find(KGetMidletSuiteVersionPrefix) == 0) {
 		TRAP_IGNORE(res = GetMidletSuiteVersionL(aProperty));
 		return res;
 	}
 	if (aProperty->Find(KLaunchMidletPrefix) == 0) {
 		TRAP_IGNORE(res = LaunchMidletL(aProperty));
+		return res;
+	}
+	if (aProperty->Find(KIsAppRunningPrefix) == 0) {
+		TRAP_IGNORE(res = IsAppRunningL(aProperty));
+		return res;
+	}
+	if (aProperty->Find(KBringAppToForegroundPrefix) == 0) {
+		TRAP_IGNORE(res = BringAppToForegroundL(aProperty));
 		return res;
 	}
 #ifdef EKA2

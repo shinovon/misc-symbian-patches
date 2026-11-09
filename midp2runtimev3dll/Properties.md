@@ -78,8 +78,6 @@ if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,n
 
 Gets registered UID of Java application, can be used for isAppRunning, bringAppToForeground
 
-FUTURE
-
 Parameters:
 - name: MIDlet suite name
 - vendor: MIDlet suite vendor
@@ -89,7 +87,7 @@ Returns application UID
 
 Example:
 ```
-String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:GH2ME,nnproject,1");
+String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:GH2ME,nnproject");
 ```
 
 ---
@@ -121,8 +119,6 @@ if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppInstalled:0xe
 
 Checks if application is running
 
-FUTURE
-
 Parameters:
 - uid: Application UID (decimal, or hexadecimal with 0x)
 
@@ -151,7 +147,7 @@ Returns 0 if operation was successful, otherwise numeric error code
 Example:
 ```
 // Launch CorePlayer
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:0x20012fa6"))) {
+if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchApp:0x20012fa6"))) {
     // ...
 }
 ```
@@ -178,7 +174,7 @@ if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:" + b
     if ("true".equals(System.getProperty("cc.nnproject.symbianext.bringAppToForeground:" + browserUid + ",0,http://nnproject.cc/"))) {
         // ...
     }
-} else if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:" + browserUid + ",http://nnproject.cc/"))) {
+} else if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchApp:" + browserUid + ",http://nnproject.cc/"))) {
     // ...
 }
 ```

@@ -28,6 +28,7 @@ LIBRARY efsrv.lib
 LIBRARY bafl.lib
 LIBRARY apgrfx.lib
 LIBRARY apparc.lib
+LIBRARY ws32.lib
 #ifdef EKA2
 LIBRARY sisregistryclient.lib
 #endif
