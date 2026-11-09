@@ -57,7 +57,7 @@ TInt GetId2L(TPtrC aName, TPtrC aVendor) {
 	db.Close();
 	dbs.Close();
 	if (!found) {
-		User::Leave(-123);
+		User::Leave(-1);
 	}
 	return id;
 }
@@ -109,7 +109,7 @@ TInt RunL(TPtrC param) {
 	
 	TInt commaIdx = param.Locate(',');
 		
-	if (commaIdx == -1) return -101;
+	if (commaIdx == -1) return KErrArgument;
 	TPtrC name = param.Left(commaIdx);
 	TPtrC vendor = param.Mid(commaIdx + 1);
 	TUint32 midletId = 1;
@@ -127,18 +127,18 @@ TInt RunL(TPtrC param) {
 		}
 		
 		TLex lexer(midletIdDes);
-		if (lexer.Val(midletId, EDecimal) != KErrNone) return -102;
+		if (lexer.Val(midletId, EDecimal) != KErrNone) return KErrArgument;
 	}
 	
 	TUint32 suiteId = 0;
 #ifdef EKA2
 	TRAP(res, suiteId = GetId2L(name, vendor));
-	if (res != KErrNotFound && res != KErrNotSupported && res != 0) return res - 200;
+	if (res != KErrNotFound && res != KErrNotSupported && res != 0) return res;
 	if (res != 0)
 #endif
 	{
 		TRAP(res, suiteId = GetIdL(name, vendor));
-		if (res != KErrNone) return res - 300;
+		if (res != KErrNone) return res;
 	}
 	
 	RLibrary lib;
@@ -176,8 +176,6 @@ TInt RunL(TPtrC param) {
 
 TInt E32Main() {
 	CTrapCleanup* cleanup = CTrapCleanup::New();
-	
-//	User::After(30000000);
 	
 #ifdef EKA2
 	HBufC* cmd = HBufC::New(User::CommandLineLength());

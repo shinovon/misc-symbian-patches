@@ -37,6 +37,13 @@ _LIT(KApiVersion, "1.0");
 typedef HBufC* (*TPropertyFunction0)(void*);
 typedef HBufC* (*TPropertyFunction1)(void*, TDesC*);
 
+static TBool ParseInt(TPtrC aDes, TUint32& aVal) {
+	TLex lexer(aDes);
+	TBool hex = aDes.Find(_L("0x")) == 0;
+	if (hex) lexer.Inc(2);
+	return lexer.Val(aVal, hex ? EHex : EDecimal) == KErrNone;
+}
+
 static HBufC* GetFreeRamL() {
 	HBufC* res = HBufC::NewLC(16);
 	int tmp;
@@ -46,8 +53,8 @@ static HBufC* GetFreeRamL() {
 	return res;
 }
 
-static TInt RunTelephonyThread(TAny* param) {
-	HBufC* res = (HBufC*) param;
+static TInt RunTelephonyThread(TAny* aParam) {
+	HBufC* res = (HBufC*) aParam;
 	TBool success = EFalse;
 	TInt error = KErrNone;
 	
@@ -156,16 +163,12 @@ static HBufC* CheckTlsL() {
 	return res;
 }
 
-static HBufC* IsAppInstalledL(TDesC* property) {
-	if ((TUint32)property->Length() <= KIsAppInstalledPrefix.iTypeLength) return NULL;
+static HBufC* IsAppInstalledL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KIsAppInstalledPrefix.iTypeLength) return NULL;
 	
 	TUint32 uid;
-	{
-		TPtrC param = property->Mid(KIsAppInstalledPrefix.iTypeLength);
-		TLex lexer(param);
-		TBool hex = param.Find(_L("0x")) == 0;
-		if (hex) lexer.Inc(2);
-		if (lexer.Val(uid, hex ? EHex : EDecimal) != KErrNone) return NULL;
+	if (!ParseInt(aProperty->Mid(KIsAppInstalledPrefix.iTypeLength), uid)) {
+		return NULL;
 	}
 	
 	RApaLsSession ls;
@@ -189,16 +192,12 @@ static HBufC* IsAppInstalledL(TDesC* property) {
 }
 
 #ifdef EKA2
-static HBufC* GetInstalledSisVersionL(TDesC* property) {
-	if ((TUint32)property->Length() <= KGetInstalledSisVersionPrefix.iTypeLength) return NULL;
+static HBufC* GetInstalledSisVersionL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KGetInstalledSisVersionPrefix.iTypeLength) return NULL;
 
 	TUint32 uid;
-	{
-		TPtrC param = property->Mid(KGetInstalledSisVersionPrefix.iTypeLength);
-		TLex lexer(param);
-		TBool hex = param.Find(_L("0x")) == 0;
-		if (hex) lexer.Inc(2);
-		if (lexer.Val(uid, hex ? EDecimal : EHex) != KErrNone) return NULL;
+	if (!ParseInt(aProperty->Mid(KGetInstalledSisVersionPrefix.iTypeLength), uid)) {
+		return NULL;
 	}
 	
 	Swi::RSisRegistrySession session;
@@ -209,20 +208,16 @@ static HBufC* GetInstalledSisVersionL(TDesC* property) {
 	CleanupClosePushL(entry);
 	User::LeaveIfError(entry.Open(session, TUid::Uid(uid)));
 	
-	HBufC* res = NULL;
-
-	TVersion version;
-	TRAPD(err, version = entry.VersionL());
-	if (err == KErrNone) {
-		res = HBufC::NewLC(16);
-		TPtr16 des = res->Des();
-		des.AppendNum((TInt)version.iMajor);
-		des.Append('.');
-		des.AppendNum((TInt)version.iMinor);
-		des.Append('.');
-		des.AppendNum((TInt)version.iBuild);
-		CleanupStack::Pop();
-	}
+	TVersion version = entry.VersionL();
+	
+	HBufC* res = res = HBufC::NewLC(16);
+	TPtr16 des = res->Des();
+	des.AppendNum((TInt)version.iMajor);
+	des.Append('.');
+	des.AppendNum((TInt)version.iMinor);
+	des.Append('.');
+	des.AppendNum((TInt)version.iBuild);
+	CleanupStack::Pop();
 
 	CleanupStack::PopAndDestroy(); // entry
 	CleanupStack::PopAndDestroy(); // session
@@ -230,17 +225,17 @@ static HBufC* GetInstalledSisVersionL(TDesC* property) {
 }
 #endif
 
-static void LaunchAppUidL(TUid uid, const TDesC& doc = KNullDesC) {
+static void LaunchAppUidL(TUid aUid, const TDesC& aDoc = KNullDesC) {
 	RApaLsSession ls;
 	User::LeaveIfError(ls.Connect());
 	CleanupClosePushL(ls);
 	
 	TApaAppInfo appInfo;
-	User::LeaveIfError(ls.GetAppInfo(appInfo, uid));
+	User::LeaveIfError(ls.GetAppInfo(appInfo, aUid));
 	
-	if (doc.Length() != 0) {
+	if (aDoc.Length() != 0) {
 		TThreadId tid;
-		ls.StartDocument(doc, uid, tid);
+		User::LeaveIfError(ls.StartDocument(aDoc, aUid, tid));
 	} else {
 		CApaCommandLine* cli = CApaCommandLine::NewLC();
 		cli->SetExecutableNameL(appInfo.iFullName);
@@ -275,36 +270,29 @@ static void LaunchAppUidL(TUid uid, const TDesC& doc = KNullDesC) {
 ////		CleanupStack::PopAndDestroy(); // ws
 }
 
-static HBufC* LaunchAppL(TDesC* property) {
-	if ((TUint32)property->Length() <= KLaunchAppPrefix.iTypeLength) return NULL;
+static HBufC* LaunchAppL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KLaunchAppPrefix.iTypeLength) return NULL;
 	
-	TPtrC param = property->Mid(KLaunchAppPrefix.iTypeLength);
+	TPtrC param = aProperty->Mid(KLaunchAppPrefix.iTypeLength);
 	
 	TUint32 uid;
 	TPtrC doc(KNullDesC);
 	{
 		TInt commaIdx = param.Locate(',');
-		TBool hex = param.Find(_L("0x")) == 0;
-		TLex lexer(commaIdx != -1 ? param.Left(commaIdx) : param);
-		if (hex) lexer.Inc(2);
-		if (lexer.Val(uid, hex ? EHex : EDecimal) != KErrNone) return NULL;
+		if (!ParseInt(commaIdx != -1 ? param.Left(commaIdx) : param, uid)) {
+			return NULL;
+		}
 		
 		if (commaIdx != -1) {
 			doc.Set(param.Mid(commaIdx + 1));
 		}
 	}
 
-	HBufC* res = NULL;
 	TRAPD(err, LaunchAppUidL(TUid::Uid(uid), doc));
-	if (err == KErrNone) {
-		res = HBufC16::NewLC(4);
-		res->Des().Append(KTrue);
-		CleanupStack::Pop();
-	} else {
-		res = HBufC16::NewLC(5);
-		res->Des().Append(KFalse);
-		CleanupStack::Pop();
-	}
+	
+	HBufC* res = res = HBufC16::NewLC(16);
+	res->Des().AppendNum((TInt)err);
+	CleanupStack::Pop();
 	
 	return res;
 }
@@ -316,10 +304,10 @@ static HBufC* GetVersionL() {
 	return res;
 }
 
-static HBufC* GetMidletSuiteVersionL(TDesC* property) {
-	if ((TUint32)property->Length() <= KGetMidletSuiteVersionPrefix.iTypeLength) return NULL;
+static HBufC* GetMidletSuiteVersionL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KGetMidletSuiteVersionPrefix.iTypeLength) return NULL;
 	
-	TPtrC param = property->Mid(KGetMidletSuiteVersionPrefix.iTypeLength);
+	TPtrC param = aProperty->Mid(KGetMidletSuiteVersionPrefix.iTypeLength);
 	TInt commaIdx = param.Locate(',');
 	
 	if (commaIdx == -1) return NULL;
@@ -331,40 +319,78 @@ static HBufC* GetMidletSuiteVersionL(TDesC* property) {
 	if (lib.Load(_L("javaregistry.dll")) != KErrNone) {
 		return NULL;
 	}
+	CleanupClosePushL(lib);
 	
 #ifdef EKA2
 	void* func = (void*) lib.Lookup(5);
 #else
 	void* func = (void*) lib.Lookup(3);
 #endif
-	if (func != NULL) {
-		MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
-		if (registry != NULL) {
-			MJavaRegistrySuiteEntry* entry = NULL;
-			TRAPD(err, entry = registry->SuiteEntryL(name, vendor));
-			if (err == KErrNone && entry != NULL) {
-				TAppVersion version = entry->VersionL();
-				res = HBufC16::NewLC(16);
-				TPtr16 des = res->Des();
-				des.AppendNum((TInt)version.iMajor);
-				des.Append('.');
-				des.AppendNum((TInt)version.iMinor);
-				des.Append('.');
-				des.AppendNum((TInt)version.iBuild);
-				CleanupStack::Pop();
-			}
-			registry->Release();
-		}
-	}
+	if (!func) User::Leave(KErrNotSupported);
 	
-	lib.Close();
+	MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
+	User::LeaveIfNull(registry);
+	CleanupReleasePushL(*registry);
+	
+	MJavaRegistrySuiteEntry* entry = registry->SuiteEntryL(name, vendor);
+	
+	TAppVersion version = entry->VersionL();
+	res = HBufC16::NewLC(16);
+	TPtr16 des = res->Des();
+	des.AppendNum((TInt)version.iMajor);
+	des.Append('.');
+	des.AppendNum((TInt)version.iMinor);
+	des.Append('.');
+	des.AppendNum((TInt)version.iBuild);
+	CleanupStack::Pop();
+	
+	CleanupStack::PopAndDestroy(); // registry
+	CleanupStack::PopAndDestroy(); // lib
+	
 	return res;
 }
 
-static HBufC* LaunchMidletL(TDesC* property) {
-	if ((TUint32)property->Length() <= KLaunchMidletPrefix.iTypeLength) return NULL;
+static void DoLaunchMidletL(TPtrC aParam, TPtrC aName, TPtrC aVendor, TUint32 aMidletId) {
+	RLibrary lib;
+	User::LeaveIfError(lib.Load(_L("javaregistry.dll")));
+	CleanupClosePushL(lib);
+		
+#ifdef EKA2
+	void* func = (void*) lib.Lookup(5);
+#else
+	void* func = (void*) lib.Lookup(3);
+#endif
+	if (!func) User::Leave(KErrNotSupported);
 	
-	TPtrC param = property->Mid(KLaunchMidletPrefix.iTypeLength);
+	MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
+	User::LeaveIfNull(registry);
+	CleanupReleasePushL(*registry);
+	
+	MJavaRegistrySuiteEntry* suite = registry->SuiteEntryL(aName, aVendor);
+	MJavaRegistryMIDletEntry* midlet = suite->MIDletByNumberL(aMidletId);
+	TUid uid = midlet->UidL();
+	
+	RProcess process;
+	CleanupClosePushL(process);
+	User::LeaveIfError(process.Create(_L("midp2launcher.exe"), aParam));
+	
+	TRequestStatus status;
+	process.Logon(status);
+	process.Resume();
+	User::WaitForRequest(status);
+	
+	TInt reason = process.ExitReason();
+	if (reason != 0) User::Leave(reason);
+
+	CleanupStack::PopAndDestroy(); // process
+	CleanupStack::PopAndDestroy(); // registry
+	CleanupStack::PopAndDestroy(); // lib
+}
+
+static HBufC* LaunchMidletL(TDesC* aProperty) {
+	if ((TUint32)aProperty->Length() <= KLaunchMidletPrefix.iTypeLength) return NULL;
+	
+	TPtrC param = aProperty->Mid(KLaunchMidletPrefix.iTypeLength);
 	TInt commaIdx = param.Locate(',');
 	
 	if (commaIdx == -1) return NULL;
@@ -388,140 +414,70 @@ static HBufC* LaunchMidletL(TDesC* property) {
 		if (lexer.Val(midletId, EDecimal) != KErrNone) return NULL;
 	}
 	
-	HBufC* res = NULL;
-	RLibrary lib;
-	if (lib.Load(_L("javaregistry.dll")) != KErrNone) {
-		return NULL;
-	}
-		
-#ifdef EKA2
-	void* func = (void*) lib.Lookup(5);
-#else
-	void* func = (void*) lib.Lookup(3);
-#endif
-	if (func != NULL) {
-		MJavaRegistry* registry = ((MJavaRegistry* (*)(void))func)();
-		if (registry != NULL) {
-			MJavaRegistrySuiteEntry* suite = NULL;
-			TRAPD(err, suite = registry->SuiteEntryL(name, vendor));
-			if (err != KErrNone || suite == NULL) goto ret2;
-			
-			MJavaRegistryMIDletEntry* midlet = NULL;
-			TRAP(err, midlet = suite->MIDletByNumberL(midletId));
-			if (err != KErrNone || midlet == NULL) goto ret2;
-			
-			TUid uid = TUid::Null();
-			TRAP(err, uid = midlet->UidL());
-			if (err != KErrNone) goto ret2;
-			
-//			TRAP(err, LaunchAppUidL(uid));
-//			if (err == KErrNone) {
-//				res = HBufC16::NewLC(4);
-//				res->Des().Append(KTrue);
-//				CleanupStack::Pop();
-//			} else {
-//				res = HBufC16::NewLC(5);
-//				res->Des().Append(KFalse);
-//				CleanupStack::Pop();
-//			}
-			
-//			HBufC* runcmd = NULL;
-//			TRAP(err, runcmd = HBufC::NewL(param.Length() + 32));
-//			if (err != KErrNone || runcmd == NULL) goto ret2;			
-//			TPtr des = runcmd->Des();
-//			des.AppendFormat(_L("%x %d "), suite->UidL().iUid, midletId);
-//			des.Append(cmd);
-			
-			RProcess process;
-//			if (process.Create(_L("midp2launcher.exe"), des) != KErrNone) goto ret2;
-			if (process.Create(_L("midp2launcher.exe"), param) != KErrNone) goto ret2;
-			
-			TRequestStatus status;
-			process.Logon(status);
-			process.Resume();
-			User::WaitForRequest(status);
-			
-			
-//			if ( == 0) {
-				res = HBufC16::NewLC(10);
-				res->Des().AppendNum((TInt)process.ExitReason());
-				CleanupStack::Pop();
-//			}
-				
-			process.Close();
-//			delete runcmd;
-		}
-		
-		ret2:
-		if (registry != NULL) registry->Release();
-	}
-	if (res == NULL) {
-		res = HBufC16::NewLC(5);
-		res->Des().Append(KFalse);
-		CleanupStack::Pop();
-	}
-
-	lib.Close();
+	TRAPD(err, DoLaunchMidletL(param, name, vendor, midletId))
+	HBufC* res = HBufC16::NewLC(16);
+	res->Des().AppendNum((TInt)err);
+	CleanupStack::Pop();
 	return res;
 }
 
-HBufC* GetDynamicProperty(void* self, TDesC* property) {
+HBufC* GetDynamicProperty(void* aThis, TDesC* aProperty) {
 	HBufC* res = NULL;
 #ifndef EKA2
-	if (!property->Compare(_L("microedition.locale"))) {
-			TRAP_IGNORE(res = (*(TPropertyFunction0**)self)[4](self));
+	if (!aProperty->Compare(_L("microedition.locale"))) {
+			TRAP_IGNORE(res = (*(TPropertyFunction0**)aThis)[4](aThis));
 			if (res != NULL) return res->Alloc();
 			return NULL;
 		}
-		if (!property->Compare(_L("microedition.timezone"))) {
-			TRAP_IGNORE(res = (*(TPropertyFunction0**)self)[5](self));
+		if (!aProperty->Compare(_L("microedition.timezone"))) {
+			TRAP_IGNORE(res = (*(TPropertyFunction0**)aThis)[5](aThis));
 			if (res != NULL) return res->Alloc();
 			return NULL;
 		}
 #endif
-	if (!property->Compare(_L("com.nokia.memoryramfree"))) {
+	if (!aProperty->Compare(_L("com.nokia.memoryramfree"))) {
 		TRAP_IGNORE(res = GetFreeRamL());
 		return res;
 	}
-	if (!property->Compare(_L("com.nokia.mid.batterylevel"))) {
+	if (!aProperty->Compare(_L("com.nokia.mid.batterylevel"))) {
 		TRAP_IGNORE(res = GetBatteryLevelL());
 		return res;
 	}
-	if (!property->Compare(_L("cc.nnproject.symbianext.version"))) {
+	if (!aProperty->Compare(_L("cc.nnproject.symbianext.version"))) {
 		TRAP_IGNORE(res = GetVersionL());
 		return res;
 	}
-	if (!property->Compare(_L("cc.nnproject.symbianext.checkTLS12"))) {
+	if (!aProperty->Compare(_L("cc.nnproject.symbianext.checkTLS12"))) {
 		TRAP_IGNORE(res = CheckTlsL());
 		return res;
 	}
-	if (property->Find(KIsAppInstalledPrefix) == 0) {
-		TRAP_IGNORE(res = IsAppInstalledL(property));
+	if (aProperty->Find(KIsAppInstalledPrefix) == 0) {
+		TRAP_IGNORE(res = IsAppInstalledL(aProperty));
 		return res;
 	}
-	if (property->Find(KLaunchAppPrefix) == 0) {
-		TRAP_IGNORE(res = LaunchAppL(property));
+	if (aProperty->Find(KLaunchAppPrefix) == 0) {
+		TRAP_IGNORE(res = LaunchAppL(aProperty));
 		return res;
 	}
-//	if (property->Find(KGetMidletSuiteUidPrefix) == 0) {
-//		TRAP_IGNORE(res = GetMidletSuiteUidL(property));
+//	if (aProperty->Find(KGetMidletSuiteUidPrefix) == 0) {
+//		TRAP_IGNORE(res = GetMidletSuiteUidL(aProperty));
 //		return res;
 //	}
-	if (property->Find(KGetMidletSuiteVersionPrefix) == 0) {
-		TRAP_IGNORE(res = GetMidletSuiteVersionL(property));
+	if (aProperty->Find(KGetMidletSuiteVersionPrefix) == 0) {
+		TRAP_IGNORE(res = GetMidletSuiteVersionL(aProperty));
 		return res;
 	}
-	if (property->Find(KLaunchMidletPrefix) == 0) {
-		TRAP_IGNORE(res = LaunchMidletL(property));
+	if (aProperty->Find(KLaunchMidletPrefix) == 0) {
+		TRAP_IGNORE(res = LaunchMidletL(aProperty));
 		return res;
 	}
 #ifdef EKA2
-	if (property->Find(KGetInstalledSisVersionPrefix) == 0) {
-		TRAP_IGNORE(res = GetInstalledSisVersionL(property));
+	if (aProperty->Find(KGetInstalledSisVersionPrefix) == 0) {
+		TRAP_IGNORE(res = GetInstalledSisVersionL(aProperty));
 		return res;
 	}
 
-	return (*(TPropertyFunction1**)self)[sizeof_Runtime_vtable >> 2](self, property);
+	return (*(TPropertyFunction1**)aThis)[sizeof_Runtime_vtable >> 2](aThis, aProperty);
 #else
 	return NULL;
 #endif

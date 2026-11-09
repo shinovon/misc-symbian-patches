@@ -63,11 +63,10 @@ Parameters:
 - num: MIDlet number starting from 1, defaults to 1 if not specified
 - cmd: Command line arguments, optional
 
-Returns 0 if launch was successful
+Returns 0 if operation was successful, otherwise numeric error code
 
 Example:
 ```
-// Launch MPGram
 if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,nnproject,1,-Dasd=dsa -Ddsa=asd"))) {
     // ...
 }
@@ -75,7 +74,7 @@ if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:MPGram,n
 
 ---
 
-### `cc.nnproject.symbianext.getMidletUid:<name>,<vendor>[,<num>]]`
+### `cc.nnproject.symbianext.getMidletUid:<name>,<vendor>[,<num>]`
 
 Gets registered UID of Java application, can be used for isAppRunning, bringAppToForeground
 
@@ -90,8 +89,7 @@ Returns application UID
 
 Example:
 ```
-// Launch MPGram
-String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:MPGram,nnproject,1");
+String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:GH2ME,nnproject,1");
 ```
 
 ---
@@ -104,14 +102,15 @@ String mpgramUid = System.getProperty("cc.nnproject.symbianext.getMidletUid:MPGr
 
 Checks if Symbian application is installed
 
-uid: Application UID (decimal, or hexadecimal with 0x)
+Parameters:
+- uid: Application UID (decimal, or hexadecimal with 0x)
 
-Returns true if application is runnable, false otherwise
+Returns true if application can be run, false otherwise
 
 Example:
 ```
 // Is ClassiCube installed
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppInstalled:e212a5c2"))) {
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppInstalled:0xe212a5c2"))) {
     // ...
 }
 ```
@@ -132,7 +131,7 @@ Returns true if application is running, false otherwise
 Example:
 ```
 // Is X-Plore running
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:a0000bcd"))) {
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:0xa0000bcd"))) {
     // ...
 }
 ```
@@ -147,12 +146,12 @@ Parameters:
 - uid: Application UID (decimal, or hexadecimal with 0x)
 - document: ApaCommandLine document path, optional
 
-Returns true if launch was successful, false if application was not found
+Returns 0 if operation was successful, otherwise numeric error code
 
 Example:
 ```
-// Launch X-Plore
-if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:a0000bcd"))) {
+// Launch CorePlayer
+if ("true".equals(System.getProperty("cc.nnproject.symbianext.launchApp:0x20012fa6"))) {
     // ...
 }
 ```
@@ -174,7 +173,7 @@ Returns true if operation was successful, false otherwise
 
 Example:
 ```
-String browserUid = "10008d39";
+String browserUid = "0x10008d39";
 if ("true".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:" + browserUid))) {
     if ("true".equals(System.getProperty("cc.nnproject.symbianext.bringAppToForeground:" + browserUid + ",0,http://nnproject.cc/"))) {
         // ...
